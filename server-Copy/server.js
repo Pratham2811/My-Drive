@@ -1,10 +1,11 @@
 import express from "express"
-import { readFile } from "fs/promises";
 const port=80;
 import {readdir}  from "fs/promises"
 import  fs from "fs/promises"
 import path from "path";
  const app=express();
+
+ //enabling cors 
 app.use((req,res,next)=>{
 res.set("access-control-allow-origin","*");
 res.set("access-control-allow-Methods","*");
@@ -12,21 +13,18 @@ next();
 
 })
 
+//serving file
 
-app.use((req,res,next)=>{
-   
-  if(req.query.action==="download"){
-    res.set("Content-Disposition","attachment")
-    console.log("Reuest ");
-    
-  }
- 
-    const serveStatic=express.static("storage");
-  serveStatic(req,res,next);
+
+app.get('/:filename',(req,res)=>{
+  const url=decodeURIComponent(req.url)
+  console.log(url);
+  console.log(req.params);
+  
+  res.end("Hello")
+  
 })
-
-
-
+//serving directory content
  app.get("/",async (req,res,next)=>{
    try{
     const directoryPath=`./storage/${req.url||""}`
@@ -43,22 +41,15 @@ app.use((req,res,next)=>{
             };
       })
     )
-
     console.log(fileListWithMetaData);
-    
     res.json(fileListWithMetaData)
    }catch(error){
-  
-      console.log("server Error",error);
-
-      
+      console.log("server Error",error);  
    }
    
  })
  app.delete("",(req,res,next)=>{
-  console.log("request has came");
-  
-         
+  console.log("request has came");      
  })
  
  app.listen(port,()=>{
