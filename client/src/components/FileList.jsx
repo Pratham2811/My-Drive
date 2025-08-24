@@ -83,9 +83,7 @@ const handleDownloadFile = (fileName) => {
 
   const handleDeleteFile = async (fileName) => {
     const filePath = currentPath ? `${currentPath}/${fileName}` : `${fileName}`;
-    const url = `http://localhost:80/${filePath}?filename=${encodeURIComponent(
-      fileName
-    )}`;
+    const url = `http://localhost:80/${filePath}?action=delete`;
     console.log("dunction is runiing");
     
     try {

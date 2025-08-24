@@ -1,8 +1,13 @@
+import { error } from "console";
 import express from "express"
+import { rm } from "fs/promises";
 const port=80;
 import {readdir}  from "fs/promises"
 import  fs from "fs/promises"
-import path from "path";
+import path, { dirname ,join} from "path";
+import { fileURLToPath } from "url";
+
+
  const app=express();
 
  //enabling cors 
@@ -13,44 +18,77 @@ next();
 
 })
 
+app.use("/",(error,req,res,next)=>{
+  console.log("Error has:",error);
+  
+})
+
 //serving file
 
-
+const _filename=fileURLToPath(import.meta.url);
+const _dirname=dirname(_filename);
 app.get('/:filename',(req,res)=>{
-  const url=decodeURIComponent(req.url)
+  const url=decodeURIComponent(req.url);
   console.log(url);
-  console.log(req.params);
+ const filename=req.params.filename;
+  const filePath=path.join(_dirname,"storage",filename);
+  console.log(req.query.action);
+  res.setHeader("content-Disposition","inline");
+  if(req.query.action==="download"){
+    res.setHeader("content-Disposition","attachment");
+        console.log("sending file");
+     res.sendFile(filePath);
+     
+  }
   
-  res.end("Hello")
+  res.sendFile(filePath);
+
+  
+
+  
+})
+//delete file
+app.delete("/:filename",async (req,res)=>{
+  console.log(req.params);
+  console.log(req.params.filename);
+  const filePath=path.join("storage",req.params.filename)
+  await rm(filePath);
+
+  
+ res.send("File deleted sucessfully")
   
 })
 //serving directory content
- app.get("/",async (req,res,next)=>{
-   try{
-    const directoryPath=`./storage/${req.url||""}`
-    const fileList= await  readdir(directoryPath);
-    // console.log(fileList);
-    const fileListWithMetaData=await Promise.all(
-      fileList.map(async (file)=>{
-          const filePpath=path.join(directoryPath,file)
-              const fileStat= await fs.stat(filePpath)
-                 return {
-                name: file,
-                type: fileStat.isDirectory() ? "folder" : "file",
-                size: fileStat.size
-            };
+app.get("/*", async (req, res) => {
+  try {
+    // Get subpath after "/"
+    const subPath = decodeURIComponent(req.params[0] || "");
+    const directoryPath = join(storageDir, subPath);
+
+    console.log("Listing:", directoryPath);
+
+    const fileList = await readdir(directoryPath);
+
+    const fileListWithMetaData = await Promise.all(
+      fileList.map(async (file) => {
+        const filePath = join(directoryPath, file);
+        const fileStat = await stat(filePath);
+
+        return {
+          name: file,
+          type: fileStat.isDirectory() ? "folder" : "file",
+          size: fileStat.size,
+        };
       })
-    )
-    console.log(fileListWithMetaData);
-    res.json(fileListWithMetaData)
-   }catch(error){
-      console.log("server Error",error);  
-   }
-   
- })
- app.delete("",(req,res,next)=>{
-  console.log("request has came");      
- })
+    );
+
+    res.json(fileListWithMetaData);
+  } catch (error) {
+    console.error("Server Error:", error);
+    res.status(500).send("Failed to read directory");
+  }
+});
+
  
  app.listen(port,()=>{
     console.log(`server is listening on ${port}`);
