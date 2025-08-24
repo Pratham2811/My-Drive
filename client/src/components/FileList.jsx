@@ -96,7 +96,7 @@ export const FileList = () => {
       if (!res.ok) throw new Error(`Error: ${res.statusText}`);
       const data = res.json();
 
-      console.log(`File deleted: ${await res.text()}`);
+      // console.log(`File deleted: ${await res.json()}`);
       show(`${fileName} ${data?.message} ✅`);
       fetchFiles();
     } catch (err) {
@@ -156,7 +156,7 @@ export const FileList = () => {
                 title={item.name} // 👈 tooltip on hover
                 className="text-sm sm:text-base font-semibold text-gray-200 truncate block max-w-[600px] cursor-pointer"
               >
-                {item.name ||}
+                {item.name }
               </span>
             </div>
 
@@ -202,7 +202,7 @@ export const FileList = () => {
       </div>
       {/* Popup UI element - it will be visible only when `showPopup` is true */}
       {showPopup && (
-        <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-gray-800 text-white p-6 rounded-lg shadow-2xl z-50 animate-fade-in-down transition-all duration-300">
+        <div className="fixed top-1/8 left-1/2 transform -translate-x--3/2 -translate-y-1/2 bg-gray-800 text-white p-6 rounded-lg shadow-2xl z-50 animate-fade-in-down transition-all duration-300">
           <p className="text-lg font-semibold">{popupMessage}</p>
         </div>
       )}

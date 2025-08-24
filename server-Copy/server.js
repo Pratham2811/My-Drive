@@ -81,20 +81,25 @@ app.get('/:filename',(req,res)=>{
 
   
 })
-//delete file
-app.delete("/:filename",(req,res)=>{
+//move file to trash 
+app.delete("/:filename",async (req,res)=>{
   console.log("FIle delete request has come");
   
   const {filename}=req.params;
-  
+ const sourcePath = path.join(_dirname,"storage", filename); // old folder
+  const destPath = path.join(_dirname, filename);
   
  const filePath=path.join(_dirname,'storage',filename);
  console.log(filePath);
  
  try{
    
-  rm(filePath);
-  console.log("file deleted sucessfully");
+  await fs.rename(sourcePath,destPath,(err)=>{
+  console.log("Error moving FIle to trash:",err);
+  
+})
+  
+  console.log("file moved to trash sucessfully");
 
   res.json({
     message:"File deleted sucessfully",
