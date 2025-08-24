@@ -4,8 +4,9 @@ import { FileList } from "@/components/FileList";
 import { Menu } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useEffect } from "react";
+import TrashFiles from "@/components/TrashFiles";
 export const HomePage = () => {
-  const [activePage, setActivePage] = useState("upload");
+  const [activePage, setActivePage] = useState("files");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false); // Changed to false by default for mobile
   const [isMobile, setIsMobile] = useState(false);
 
@@ -36,8 +37,10 @@ export const HomePage = () => {
         return <UploadForm />;
       case "files":
         return <FileList />;
+        case "trash":
+        return <TrashFiles />
       default:
-        return <UploadForm />;
+        return <FileList />;
     }
   };
 
@@ -69,8 +72,38 @@ export const HomePage = () => {
         <nav className="flex flex-col p-4 space-y-2">
           <button
             className={`flex items-center gap-3 px-4 py-2 rounded-lg transition-all duration-200 ${
-              activePage === "upload"
+              activePage === "files"
                 ? "bg-gradient-to-r from-blue-500 to-purple-600 shadow-lg scale-105"
+                : "hover:bg-gray-800/50"
+            }`}
+            onClick={() => {
+              setActivePage("files");
+              if (isMobile) {
+                setIsSidebarOpen(false);
+              }
+            }}
+          >
+             <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="lucide lucide-folder"
+            >
+              <path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-8l-2-3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z" />
+            </svg>
+         
+            <span className="font-semibold">Files</span>
+          </button>
+          <button
+            className={`flex items-center gap-3 px-4 py-2 rounded-lg transition-all duration-200 ${
+              activePage === "upload"
+                ? "bg-gradient-to-r from-green-500 to-teal-600 shadow-lg scale-105"
                 : "hover:bg-gray-800/50"
             }`}
             onClick={() => {
@@ -80,7 +113,7 @@ export const HomePage = () => {
               }
             }}
           >
-            <svg
+              <svg
               xmlns="http://www.w3.org/2000/svg"
               width="24"
               height="24"
@@ -96,36 +129,38 @@ export const HomePage = () => {
               <polyline points="17 8 12 3 7 8" />
               <line x1="12" x2="12" y1="3" y2="15" />
             </svg>
-            <span className="font-semibold">Upload</span>
+            <span className="font-semibold">Uplaod</span>
           </button>
           <button
             className={`flex items-center gap-3 px-4 py-2 rounded-lg transition-all duration-200 ${
-              activePage === "files"
-                ? "bg-gradient-to-r from-green-500 to-teal-600 shadow-lg scale-105"
+              activePage === "trash"
+                ? "bg-gradient-to-r from-red-300 to-red-500 shadow-lg scale-105"
                 : "hover:bg-gray-800/50"
             }`}
             onClick={() => {
-              setActivePage("files");
+              setActivePage("trash");
               if (isMobile) {
                 setIsSidebarOpen(false);
               }
             }}
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="lucide lucide-folder"
-            >
-              <path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-8l-2-3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z" />
-            </svg>
-            <span className="font-semibold">Files</span>
+           <svg
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  strokeWidth="2"
+  strokeLinecap="round"
+  strokeLinejoin="round"
+  className="lucide lucide-trash"
+>
+  <path d="M3 6h18" />
+  <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+  <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+</svg>
+            <span className="font-semibold">Trash</span>
           </button>
         </nav>
       </aside>

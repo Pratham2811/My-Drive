@@ -5,14 +5,7 @@ const SideBar = ({ setActiveTab, activeTab }) => {
     <div className="w-60 bg-gray-900 text-white p-6 space-y-4">
       <h2 className="text-xl font-bold mb-4">File Manager</h2>
 
-      <button
-        onClick={() => setActiveTab("upload")}
-        className={`block w-full text-left p-3 rounded ${
-          activeTab === "upload" ? "bg-gray-700" : "hover:bg-gray-800"
-        }`}
-      >
-        Upload
-      </button>
+   
 
       <button
         onClick={() => setActiveTab("files")}
@@ -21,6 +14,22 @@ const SideBar = ({ setActiveTab, activeTab }) => {
         }`}
       >
         Files
+      </button>
+         <button
+        onClick={() => setActiveTab("upload")}
+        className={`block w-full text-left p-3 rounded ${
+          activeTab === "upload" ? "bg-gray-700" : "hover:bg-gray-800"
+        }`}
+      >
+        Upload
+      </button>
+       <button
+        onClick={() => setActiveTab("trash")}
+        className={`block w-full text-left p-3 rounded ${
+          activeTab === "trash" ? "bg-gray-700" : "hover:bg-gray-800"
+        }`}
+      >
+        Trash File
       </button>
     </div>
   );

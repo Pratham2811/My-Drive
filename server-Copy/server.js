@@ -12,8 +12,11 @@ import { fileURLToPath } from "url";
 
  //enabling cors 
 app.use((req,res,next)=>{
-res.set("access-control-allow-origin","*");
-res.set("access-control-allow-Methods","*");
+res.set({
+"access-control-allow-origin":"*",
+"access-control-allow-Methods":"*",
+
+})
 next();
 
 })
@@ -23,6 +26,34 @@ app.use("/",(error,req,res,next)=>{
   
 })
 
+//serviing trash folder 
+app.get("/trash", async (req,res,next)=>{
+  try{
+   const directoryPath="trash"
+    const fileList= await  readdir("trash");
+   console.log(fileList);
+    const fileListWithMetaData=await Promise.all(
+      fileList.map(async (file)=>{
+          const filePpath=path.join(directoryPath,file)
+              const fileStat= await fs.stat(filePpath);
+                 return {
+                name: file,
+                type: fileStat.isDirectory() ? "folder" : "file",
+                size: fileStat.size
+            };
+      })
+    )
+    
+    res.json(fileListWithMetaData)
+ 
+   
+  }catch(err){
+   console.log("Server error:",err);
+   res.status(500).send("error from server")
+   
+  }
+ })
+
 //serving file
 
 const _filename=fileURLToPath(import.meta.url);
@@ -31,7 +62,10 @@ app.get('/:filename',(req,res)=>{
   const url=decodeURIComponent(req.url);
   console.log(url);
  const filename=req.params.filename;
+
+ 
   const filePath=path.join(_dirname,"storage",filename);
+   console.log(filePath);
   console.log(req.query.action);
   res.setHeader("content-Disposition","inline");
   if(req.query.action==="download"){
@@ -48,49 +82,57 @@ app.get('/:filename',(req,res)=>{
   
 })
 //delete file
-app.delete("/:filename",async (req,res)=>{
-  console.log(req.params);
-  console.log(req.params.filename);
-  const filePath=path.join("storage",req.params.filename)
-  await rm(filePath);
+app.delete("/:filename",(req,res)=>{
+  console.log("FIle delete request has come");
+  
+  const {filename}=req.params;
+  
+  
+ const filePath=path.join(_dirname,'storage',filename);
+ console.log(filePath);
+ 
+ try{
+   
+  rm(filePath);
+  console.log("file deleted sucessfully");
 
+  res.json({
+    message:"File deleted sucessfully",
+  })
+ }catch(err){
+  res.status(400).json({message:"File Not Found"})
+  console.log("Not file found to delete");
   
- res.send("File deleted sucessfully")
-  
+ }
 })
 //serving directory content
-app.get("/*", async (req, res) => {
-  try {
-    // Get subpath after "/"
-    const subPath = decodeURIComponent(req.params[0] || "");
-    const directoryPath = join(storageDir, subPath);
-
-    console.log("Listing:", directoryPath);
-
-    const fileList = await readdir(directoryPath);
-
-    const fileListWithMetaData = await Promise.all(
-      fileList.map(async (file) => {
-        const filePath = join(directoryPath, file);
-        const fileStat = await stat(filePath);
-
-        return {
-          name: file,
-          type: fileStat.isDirectory() ? "folder" : "file",
-          size: fileStat.size,
-        };
+ app.get("/",async (req,res,next)=>{
+   try{
+    const directoryPath=`./storage/${req.url||""}`
+    const fileList= await  readdir(directoryPath);
+    // console.log(fileList);
+    const fileListWithMetaData=await Promise.all(
+      fileList.map(async (file)=>{
+          const filePpath=path.join(directoryPath,file)
+              const fileStat= await fs.stat(filePpath);
+                 return {
+                name: file,
+                type: fileStat.isDirectory() ? "folder" : "file",
+                size: fileStat.size
+            };
       })
-    );
-
-    res.json(fileListWithMetaData);
-  } catch (error) {
-    console.error("Server Error:", error);
-    res.status(500).send("Failed to read directory");
-  }
-});
+    )
+    // console.log(fileListWithMetaData);
+    res.json(fileListWithMetaData)
+   }catch(error){
+      console.log("server Error",error);  
+   }
+   
+ })
 
  
  app.listen(port,()=>{
     console.log(`server is listening on ${port}`);
     
  })
+
