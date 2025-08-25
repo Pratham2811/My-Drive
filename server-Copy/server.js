@@ -1,5 +1,6 @@
 import { error } from "console";
 import express from "express"
+import { createWriteStream } from "fs";
 import { rm } from "fs/promises";
 const port=80;
 import {readdir}  from "fs/promises"
@@ -15,7 +16,7 @@ app.use((req,res,next)=>{
 res.set({
 "access-control-allow-origin":"*",
 "access-control-allow-Methods":"*",
-
+"access-control-allow-Headers":"*",
 })
 next();
 
@@ -87,7 +88,7 @@ app.delete("/:filename",async (req,res)=>{
   
   const {filename}=req.params;
  const sourcePath = path.join(_dirname,"storage", filename); // old folder
-  const destPath = path.join(_dirname, filename);
+  const destPath = path.join(_dirname, "trash",filename);
   
  const filePath=path.join(_dirname,'storage',filename);
  console.log(filePath);
@@ -95,7 +96,7 @@ app.delete("/:filename",async (req,res)=>{
  try{
    
   await fs.rename(sourcePath,destPath,(err)=>{
-  console.log("Error moving FIle to trash:",err);
+  // console.log("Error moving FIle to trash:",err);
   
 })
   
@@ -109,6 +110,32 @@ app.delete("/:filename",async (req,res)=>{
   console.log("Not file found to delete");
   
  }
+})
+
+app.post("/upload",(req,res,next)=>{
+ 
+ const filename=req.params.filename
+  console.log(`./storage/${filename}`);
+  
+  const writeStream=createWriteStream(`./storage/${filename}`)
+   req.on("data",(chunk)=>{
+           writeStream.write(chunk);
+   })
+  console.log("post request");
+  req.on("end",()=>{
+    console.log("Ended writing file ");
+    res.end("File uplaoded sucessfully");
+
+    
+  })
+  
+})
+app.patch("/:filename",(req,res,next)=>{
+  console.log("Patch Request come");
+  console.log(req.params.filename);
+  res.end("Rename file recived on server")
+  
+  
 })
 //serving directory content
  app.get("/",async (req,res,next)=>{

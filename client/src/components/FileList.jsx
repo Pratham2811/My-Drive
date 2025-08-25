@@ -9,12 +9,15 @@ import {
   Trash,
 } from "lucide-react";
 import { useShowPopup } from "@/hooks/useShowPopup";
+import { RenameFile } from "@/components/RenameFile";
 export const FileList = () => {
   const [fileList, setFileList] = useState([]);
   const [currentPath, setCurrentPath] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const { showPopup, popupMessage, show } = useShowPopup();
+  const [oldFilename, setOldFilename] = useState(null);
+  const [showRenameComp, setShowRenameComp] = useState(false);
   const fetchFiles = async () => {
     setLoading(true);
     setError("");
@@ -94,7 +97,8 @@ export const FileList = () => {
 
       const res = await fetch(url, { method: "DELETE" });
       if (!res.ok) throw new Error(`Error: ${res.statusText}`);
-      const data = res.json();
+      const data = await res.json();
+      console.log(data);
 
       // console.log(`File deleted: ${await res.json()}`);
       show(`${fileName} ${data?.message} ✅`);
@@ -103,7 +107,25 @@ export const FileList = () => {
       console.error("Error deleting file:", err);
     }
   };
+ const handleFileSave= async (fileName)=>{
+  console.log("Filename from rename componenet",fileName);
+  const filepath=currentPath?`${currentPath}/${fileName}`:fileName;
+  const url=`http://localhost:80/${filepath};`
+  // //making request
+  try{
+       const response=await fetch(url,{
+        method:"PATCH",
 
+       }) 
+      const data=await response.text();
+      console.log("File Renamed scuessfully:",data);
+      
+  }catch(error){
+    console.log("Could Not Fetch the file :", error);
+    
+  }
+     setShowRenameComp(false);
+ }
   return (
     <div className="p-4 sm:p-6 md:p-8 flex-1 flex flex-col bg-gray-900 text-gray-100">
       <div className="flex justify-between items-center mb-6 border-b border-gray-700 pb-4">
@@ -156,11 +178,11 @@ export const FileList = () => {
                 title={item.name} // 👈 tooltip on hover
                 className="text-sm sm:text-base font-semibold text-gray-200 truncate block max-w-[600px] cursor-pointer"
               >
-                {item.name }
+                {item.name}
               </span>
             </div>
 
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-12">
               {item.type === "folder" ? (
                 <button
                   onClick={() => handleFolderClick(item.name)}
@@ -170,30 +192,33 @@ export const FileList = () => {
                 </button>
               ) : (
                 <>
+                <button
+                      onClick={() => handleOpenFile(item.name)}
+                      className="p-2 rounded-full border border-transparent hover:border-blue-400 transition-colors duration-200 cursor-pointer"
+                    >
+                      <ExternalLink size={20} className="text-blue-400" />
+                    </button>
+                 <button
+                      onClick={() => handleDownloadFile(item.name)}
+                      className="p-2 rounded-full border border-transparent hover:border-teal-400 transition-colors duration-200 cursor-pointer"
+                    >
+                      <Download size={20} className="text-teal-400" />
+                    </button>
+                 <button
+                      onClick={() => handleDeleteFile(item.name)}
+                      className="p-2 rounded-full border border-transparent hover:border-red-400 transition-colors duration-200 cursor-pointer"
+                    >
+                      <Trash size={20} className="text-red-400" />
+                    </button>
                   <button
-                    onClick={() => handleOpenFile(item.name)}
-                    className="flex items-center gap-1 bg-blue-600 hover:bg-blue-500 text-white px-3 py-1 rounded-md text-xs sm:text-sm font-medium transition-colors duration-200"
-                  >
-                    <ExternalLink size={14} /> Open
-                  </button>
-                  <button
-                    onClick={() => handleDownloadFile(item.name)}
-                    className="flex items-center gap-1 bg-teal-600 hover:bg-teal-500 text-white px-3 py-1 rounded-md text-xs sm:text-sm font-medium transition-colors duration-200"
-                  >
-                    <Download size={14} /> Download
-                  </button>
-                  <button
-                    onClick={() => handleDeleteFile(item.name)}
-                    className="flex items-center gap-1 bg-red-600 hover:bg-red-500 text-white px-3 py-1 rounded-md text-xs sm:text-sm font-medium transition-colors duration-200"
-                  >
-                    <Trash size={14} />
-                  </button>
-                  <button
-                    onClick={() => console.log(`Renaming file: ${item.name}`)}
-                    className="flex items-center gap-1 bg-gray-600 hover:bg-gray-500 text-white px-3 py-1 rounded-md text-xs sm:text-sm font-medium transition-colors duration-200"
-                  >
-                    <Edit size={14} /> Rename
-                  </button>
+                      onClick={() => {
+                        setShowRenameComp(true);
+                        setOldFilename(item.name);
+                      }}
+                      className="p-2 rounded-full border border-transparent hover:border-gray-400 transition-colors duration-200 cursor-pointer"
+                    >
+                      <Edit size={20} className="text-gray-400" />
+                    </button>
                 </>
               )}
             </div>
@@ -206,6 +231,10 @@ export const FileList = () => {
           <p className="text-lg font-semibold">{popupMessage}</p>
         </div>
       )}
+      {showRenameComp && <RenameFile 
+       onClose={() => setShowRenameComp(false)}
+          OnRenameConfirm={handleFileSave}
+      fileName={oldFilename} />}
     </div>
   );
 };
