@@ -1,16 +1,16 @@
 import { error } from "console";
 import express from "express"
 import { createWriteStream } from "fs";
-import { rm } from "fs/promises";
+import { rename, rm } from "fs/promises";
 const port=80;
 import {readdir}  from "fs/promises"
 import  fs from "fs/promises"
 import path, { dirname ,join} from "path";
 import { fileURLToPath } from "url";
 
-
  const app=express();
-
+//parsing request
+app.use(express.json());
  //enabling cors 
 app.use((req,res,next)=>{
 res.set({
@@ -84,21 +84,18 @@ app.get('/:filename',(req,res)=>{
 })
 //move file to trash 
 app.delete("/:filename",async (req,res)=>{
-  console.log("FIle delete request has come");
+
   
   const {filename}=req.params;
  const sourcePath = path.join(_dirname,"storage", filename); // old folder
   const destPath = path.join(_dirname, "trash",filename);
   
  const filePath=path.join(_dirname,'storage',filename);
- console.log(filePath);
+
  
  try{
    
-  await fs.rename(sourcePath,destPath,(err)=>{
-  // console.log("Error moving FIle to trash:",err);
-  
-})
+  await fs.rename(sourcePath,destPath)
   
   console.log("file moved to trash sucessfully");
 
@@ -130,13 +127,21 @@ app.post("/upload",(req,res,next)=>{
   })
   
 })
-app.patch("/:filename",(req,res,next)=>{
-  console.log("Patch Request come");
-  console.log(req.params.filename);
-  res.end("Rename file recived on server")
-  
-  
-})
+app.patch("/:filename", async (req, res) => {
+  try {
+    const oldName = path.join(_dirname, "storage", req.params.filename);  // use params
+    const newFileName = path.join(_dirname, "storage", req.body.fileName); // use body
+
+    await fs.rename(oldName, newFileName);
+
+    console.log(`Renamed ${req.params.filename} -> ${req.body.fileName}`);
+    res.status(200).json({ message: "File renamed successfully" });
+
+  } catch (err) {
+    console.error("Rename error:", err);
+    res.status(400).json({ message: "File not found or rename failed" });
+  }
+});
 //serving directory content
  app.get("/",async (req,res,next)=>{
    try{

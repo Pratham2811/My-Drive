@@ -109,16 +109,22 @@ export const FileList = () => {
   };
  const handleFileSave= async (fileName)=>{
   console.log("Filename from rename componenet",fileName);
-  const filepath=currentPath?`${currentPath}/${fileName}`:fileName;
-  const url=`http://localhost:80/${filepath};`
+  const filepath=currentPath?`${currentPath}/${oldFilename}`:oldFilename;
+  const url=`http://localhost:80/${filepath}`
   // //making request
   try{
        const response=await fetch(url,{
         method:"PATCH",
+        headers:{
+          "content-type":"application/json",
+        },
+        body:JSON.stringify({fileName})
 
        }) 
+       if(!response.ok) throw new Error(`Error${response.statusText}`)
       const data=await response.text();
       console.log("File Renamed scuessfully:",data);
+      fetchFiles();
       
   }catch(error){
     console.log("Could Not Fetch the file :", error);
