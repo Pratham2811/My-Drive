@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+
 import {
   Download,
   ExternalLink,
@@ -10,6 +11,7 @@ import {
 } from "lucide-react";
 import { useShowPopup } from "@/hooks/useShowPopup";
 import { RenameFile } from "@/components/RenameFile";
+import { ConfirmPopup } from "./ComfirmUi";
 export const FileList = () => {
   const [fileList, setFileList] = useState([]);
   const [currentPath, setCurrentPath] = useState("");
@@ -18,6 +20,7 @@ export const FileList = () => {
   const { showPopup, popupMessage, show } = useShowPopup();
   const [oldFilename, setOldFilename] = useState(null);
   const [showRenameComp, setShowRenameComp] = useState(false);
+  const [showDeletePopup, setShowDeletePopup] = useState(false);
   const fetchFiles = async () => {
     setLoading(true);
     setError("");
@@ -88,8 +91,10 @@ export const FileList = () => {
     a.remove();
   };
 
-  const handleDeleteFile = async (fileName) => {
-    const filePath = currentPath ? `${currentPath}/${fileName}` : `${fileName}`;
+  const handleDeleteFile = async (oldFilename) => {
+    const filePath = currentPath
+      ? `${currentPath}/${oldFilename}`
+      : `${oldFilename}`;
     const url = `http://localhost:80/${filePath}`;
 
     try {
@@ -99,39 +104,39 @@ export const FileList = () => {
       if (!res.ok) throw new Error(`Error: ${res.statusText}`);
       const data = await res.json();
       console.log(data);
-
+      setShowDeletePopup(false);
       // console.log(`File deleted: ${await res.json()}`);
-      show(`${fileName} ${data?.message} ✅`);
+      show(`${oldFilename} ${data?.message} ✅`);
+
       fetchFiles();
     } catch (err) {
       console.error("Error deleting file:", err);
     }
   };
- const handleFileSave= async (fileName)=>{
-  console.log("Filename from rename componenet",fileName);
-  const filepath=currentPath?`${currentPath}/${oldFilename}`:oldFilename;
-  const url=`http://localhost:80/${filepath}`
-  // //making request
-  try{
-       const response=await fetch(url,{
-        method:"PATCH",
-        headers:{
-          "content-type":"application/json",
+  const handleFileSave = async (fileName) => {
+    console.log("Filename from rename componenet", fileName);
+    const filepath = currentPath
+      ? `${currentPath}/${oldFilename}`
+      : oldFilename;
+    const url = `http://localhost:80/${filepath}`;
+    // //making request
+    try {
+      const response = await fetch(url, {
+        method: "PATCH",
+        headers: {
+          "content-type": "application/json",
         },
-        body:JSON.stringify({fileName})
-
-       }) 
-       if(!response.ok) throw new Error(`Error${response.statusText}`)
-      const data=await response.text();
-      console.log("File Renamed scuessfully:",data);
+        body: JSON.stringify({ fileName }),
+      });
+      if (!response.ok) throw new Error(`Error${response.statusText}`);
+      const data = await response.text();
+      console.log("File Renamed scuessfully:", data);
       fetchFiles();
-      
-  }catch(error){
-    console.log("Could Not Fetch the file :", error);
-    
-  }
-     setShowRenameComp(false);
- }
+    } catch (error) {
+      console.log("Could Not Fetch the file :", error);
+    }
+    setShowRenameComp(false);
+  };
   return (
     <div className="p-4 sm:p-6 md:p-8 flex-1 flex flex-col bg-gray-900 text-gray-100">
       <div className="flex justify-between items-center mb-6 border-b border-gray-700 pb-4">
@@ -198,39 +203,41 @@ export const FileList = () => {
                 </button>
               ) : (
                 <>
-                <button
-                      onClick={() => handleOpenFile(item.name)}
-                      className="p-2 rounded-full border border-transparent hover:border-blue-400 transition-colors duration-200 cursor-pointer"
-                    >
-                      <ExternalLink size={20} className="text-blue-400" />
-                    </button>
-                 <button
-                      onClick={() => handleDownloadFile(item.name)}
-                      className="p-2 rounded-full border border-transparent hover:border-teal-400 transition-colors duration-200 cursor-pointer"
-                    >
-                      <Download size={20} className="text-teal-400" />
-                    </button>
-                 <button
-                      onClick={() => handleDeleteFile(item.name)}
-                      className="p-2 rounded-full border border-transparent hover:border-red-400 transition-colors duration-200 cursor-pointer"
-                    >
-                      <Trash size={20} className="text-red-400" />
-                    </button>
                   <button
-                      onClick={() => {
-                        setShowRenameComp(true);
-                        setOldFilename(item.name);
-                      }}
-                      className="p-2 rounded-full border border-transparent hover:border-gray-400 transition-colors duration-200 cursor-pointer"
-                    >
-                      <Edit size={20} className="text-gray-400" />
-                    </button>
+                    onClick={() => handleOpenFile(item.name)}
+                    className="p-2 rounded-full border border-transparent hover:border-blue-400 transition-colors duration-200 cursor-pointer"
+                  >
+                    <ExternalLink size={20} className="text-blue-400" />
+                  </button>
+                  <button
+                    onClick={() => handleDownloadFile(item.name)}
+                    className="p-2 rounded-full border border-transparent hover:border-teal-400 transition-colors duration-200 cursor-pointer"
+                  >
+                    <Download size={20} className="text-teal-400" />
+                  </button>
+                  <button
+                    onClick={() => {
+                      setShowDeletePopup(true);
+                      setOldFilename(item.name);
+                    }}
+                    className="p-2 rounded-full border border-transparent hover:border-red-400 transition-colors duration-200 cursor-pointer"
+                  >
+                    <Trash size={20} className="text-red-400" />
+                  </button>
+                  <button
+                    onClick={() => {
+                      setShowRenameComp(true);
+                      setOldFilename(item.name);
+                    }}
+                    className="p-2 rounded-full border border-transparent hover:border-gray-400 transition-colors duration-200 cursor-pointer"
+                  >
+                    <Edit size={20} className="text-gray-400" />
+                  </button>
                 </>
               )}
             </div>
           </div>
         ))}
-        
       </div>
       {/* Popup UI element - it will be visible only when `showPopup` is true */}
       {showPopup && (
@@ -238,10 +245,22 @@ export const FileList = () => {
           <p className="text-lg font-semibold">{popupMessage}</p>
         </div>
       )}
-      {showRenameComp && <RenameFile 
-       onClose={() => setShowRenameComp(false)}
+      {showRenameComp && (
+        <RenameFile
+          onClose={() => setShowRenameComp(false)}
           OnRenameConfirm={handleFileSave}
-      fileName={oldFilename} />}
+          fileName={oldFilename}
+        />
+      )}
+      {showDeletePopup && (
+        <ConfirmPopup
+          onCancel={() => setShowDeletePopup(false)}
+          onConfirm={handleDeleteFile}
+          filename={oldFilename}
+          headTitle="Delete File"
+          action="Delete"
+        />
+      )}
     </div>
   );
 };

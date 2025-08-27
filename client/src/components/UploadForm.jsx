@@ -4,20 +4,21 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Upload, File as FileIcon, CheckCircle, XCircle } from "lucide-react";
-
+import { MdCancel } from "react-icons/md";
 export const UploadForm = () => {
   const [uploadFile, setUploadFile] = useState(null);
   const [uploadStatus, setUploadStatus] = useState("");
   const [progress, setProgress] = useState(0);
   const [statusType, setStatusType] = useState(""); // "success" | "error"
- 
+
   const handleChange = (event) => {
     const file = event.target.files[0];
+
     if (file) {
       setUploadFile(file);
       setUploadStatus(`Ready to upload: ${file.name}`);
       setStatusType("");
-     
+
       setProgress(0); // Reset progress on new file selection
     }
   };
@@ -51,16 +52,15 @@ export const UploadForm = () => {
       const response = await fetch("http://localhost:80/upload", {
         method: "POST",
         body: formData,
-       headers:{
-        "filename":uploadFile.name,
-
-       }
-        
+        headers: {
+          filename: uploadFile.name,
+        },
       });
 
       if (response.ok) {
         setUploadStatus("File Uploaded Successfully!");
         setStatusType("success");
+        setUploadFile(null)
       } else {
         setUploadStatus("Upload failed: " + response.statusText);
         setStatusType("error");
@@ -70,6 +70,9 @@ export const UploadForm = () => {
       setUploadStatus("Upload error");
       setStatusType("error");
     }
+  };
+  const handleCancelFile = () => {
+    setUploadFile(null);
   };
 
   return (
@@ -108,9 +111,17 @@ export const UploadForm = () => {
 
               {/* File Name Display */}
               {uploadFile && (
-                <div className="flex items-center gap-2 text-gray-400 text-sm truncate max-w-[200px]">
+                <div className="flex items-center gap-2 text-gray-400 text-sm max-w-[200px]">
                   <FileIcon className="w-4 h-4 text-gray-500" />
-                  {uploadFile.name}
+
+                  <span className="truncate flex-1">{uploadFile.name}</span>
+
+                  <button
+                    className="cursor-pointer flex items-center justify-center"
+                    onClick={handleCancelFile}
+                  >
+                    <MdCancel className="text-red-500 w-4 h-4" />
+                  </button>
                 </div>
               )}
             </div>
@@ -132,7 +143,7 @@ export const UploadForm = () => {
           )}
 
           {/* Status Messages */}
-          {uploadStatus && (
+          {uploadStatus && progress === 100 && (
             <div
               className={`flex items-center gap-2 text-sm ${
                 statusType === "success"
@@ -142,9 +153,7 @@ export const UploadForm = () => {
                   : "text-gray-400"
               }`}
             >
-              {statusType === "success" && (
-                <CheckCircle className="w-4 h-4" />
-              )}
+              {statusType === "success" && <CheckCircle className="w-4 h-4" />}
               {statusType === "error" && <XCircle className="w-4 h-4" />}
               {uploadStatus}
             </div>
