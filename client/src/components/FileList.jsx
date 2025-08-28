@@ -25,7 +25,7 @@ export const FileList = () => {
     setLoading(true);
     setError("");
     try {
-      const response = await fetch(`http://localhost:80/${currentPath}`);
+      const response = await fetch(`http://localhost:80/files/${currentPath}`);
       if (!response.ok) throw new Error(`Error: ${response.statusText}`);
 
       const data = await response.json();
