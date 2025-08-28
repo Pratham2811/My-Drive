@@ -53,10 +53,17 @@ export const FileList = () => {
 
   useEffect(() => {
     fetchFiles();
-  }, [currentPath]);
+  }, []);
 
-  const handleFolderClick = (folderName) => {
-    setCurrentPath((prev) => (prev ? `${prev}/${folderName}` : folderName));
+  const handleFolderClick = async (folderName) => {
+   const newPath = currentPath ? `${currentPath}/${folderName}` : folderName;
+setCurrentPath(newPath);
+const url = `http://localhost:80/folder/${newPath}`;
+const response = await fetch(url);
+
+   const data= await response.json()
+    console.log(data);
+    
   };
 
   const handleGoBack = () => {

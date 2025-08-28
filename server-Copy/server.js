@@ -145,7 +145,34 @@ app.get("/", async (req, res, next) => {
   try {
     const directoryPath = `./storage/${req.url || ""}`;
     const fileList = await readdir(directoryPath);
-    // console.log(fileList);
+    console.log(fileList);
+    const fileListWithMetaData = await Promise.all(
+      fileList.map(async (file) => {
+        const filePpath = path.join(directoryPath, file);
+        const fileStat = await fs.stat(filePpath);
+        return {
+          name: file,
+          type: fileStat.isDirectory() ? "folder" : "file",
+          size: fileStat.size,
+        };
+      })
+    );
+    // console.log(fileListWithMetaData);
+    res.json(fileListWithMetaData);
+  } catch (error) {
+    console.log("server Error", error);
+  }
+});
+app.get("/folder/:foldername", async (req, res, next) => {
+  try {
+    console.log("request url", req.url);
+
+    
+    const directoryPath = `./storage/${req.url || ""}`;
+    console.log(directoryPath);
+    
+    const fileList = await readdir(directoryPath);
+    console.log(fileList);
     const fileListWithMetaData = await Promise.all(
       fileList.map(async (file) => {
         const filePpath = path.join(directoryPath, file);
