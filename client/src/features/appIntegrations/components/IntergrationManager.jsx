@@ -57,6 +57,8 @@ export const IntegrationsManager = () => {
   const handleConnectDrive = async () => {
     setIsOpeningPopup(true);
     try {
+    
+      
       const response = await dispatch(connectGoogleDrive()).unwrap();
 
       const popup = window.open(

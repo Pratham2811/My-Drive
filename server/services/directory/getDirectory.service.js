@@ -1,11 +1,13 @@
 import { directoryModel } from "../../models/DirectoryModel.js";
 import FileModel from "../../models/FileModel.js";
+import IntegratedAppsModel from "../../models/IntegratedAppsModel.js";
 import User from "../../models/UserModel.js";
 import { AppError } from "../../utils/AppError.js";
 import { mapMongoId } from "../../utils/mapMongoId.js";
-
 export const getDirectoryService = async (directoryId, userId) => {
+ console.log("this is dirId",directoryId);
  
+  console.log(userId);
   
   if (!directoryId) {
     const user = await User.findById(userId).lean().select("rootDirId");
@@ -47,7 +49,10 @@ export const getDirectoryService = async (directoryId, userId) => {
     })
     .lean()
     .select("name createdAt");
+
  
+
+    
  
   return {
     directory: mapMongoId(directory),

@@ -11,11 +11,11 @@ export default async function checkAuth(req, res, next) {
     const { sessionId } = req.signedCookies;
     if (!sessionId) {
       return res.status(401).json({
-        error: "Not logged in",
-        status: 401,
+        success: false,
+        message: "unauthorized!! User not logged In",
       });
     }
-  
+
     const session = await Session.findOne({ userId: sessionId });
     if (!session) {
       res.clearCookie("sessionId");
@@ -24,8 +24,6 @@ export default async function checkAuth(req, res, next) {
         status: 401,
       });
     }
-   
-
 
     // 2. ObjectId validation
     if (!mongoose.Types.ObjectId.isValid(sessionId)) {

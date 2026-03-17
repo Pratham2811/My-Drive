@@ -1,12 +1,17 @@
 import integratedAppsSlice from "@/features/appIntegrations/slice/IntegrationSlice";
 import authReducer from "@/features/auth/slices/authSlice.js";
+import explorerReducer from "@/features/Explorer/explorerSlice.js";
+import preferenceReducer from "@/slices/preferenceSlice.js";
+
 
 import { configureStore } from "@reduxjs/toolkit";
 
 const store = configureStore({
   reducer: {
     auth:authReducer,
-    integratedApps:integratedAppsSlice
+    integratedApps:integratedAppsSlice,
+    explorer:explorerReducer,
+    preference:preferenceReducer
   },
 });
 

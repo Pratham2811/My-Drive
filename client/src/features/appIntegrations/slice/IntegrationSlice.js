@@ -2,7 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 import { connectGoogleDrive, getIntegrationsInfo } from "./integrationThunk";
 
 const initialState = {
-  providers: {},
+  providers:{},
 };
 
 const integrationsSlice = createSlice({
@@ -30,12 +30,16 @@ const integrationsSlice = createSlice({
         const integrations = action.payload;
     
         
+        
         state.providers = {}; // reset first
 
         integrations.forEach((integration) => {
+       
+          
           state.providers[integration.provider] = {
             state: integration.status,
             email: integration.email,
+            id:integration.id,
             providerAccountId: integration.providerAccountId,
           };
         });

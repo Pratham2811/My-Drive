@@ -4,6 +4,8 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 export const connectGoogleDrive = createAsyncThunk(
   "integrations/googleDrive",
   async (_, { rejectWithValue }) => {
+    console.log("google Drive");
+    
     try {
       const res = await api.post("/integrations/google-drive/connect");
       return res.data;

@@ -3,20 +3,8 @@ import { AlertTriangle } from 'lucide-react';
 import { Modal } from '../ui/Modal';
 import { Button } from '../ui/Button';
 
-/**
- * Confirmation Dialog Component
- * 
- * @param {Object} props
- * @param {boolean} props.isOpen - Whether dialog is open
- * @param {Function} props.onClose - Close handler
- * @param {Function} props.onConfirm - Confirm handler
- * @param {string} props.title - Dialog title
- * @param {string} props.message - Confirmation message
- * @param {string} props.confirmText - Confirm button text (default: "Confirm")
- * @param {string} props.cancelText - Cancel button text (default: "Cancel")
- * @param {'danger'|'warning'|'info'} props.variant - Dialog variant (default: "warning")
- * @param {boolean} props.loading - Whether confirm action is loading
- */
+
+ 
 export const ConfirmDialog = ({
   isOpen,
   onClose,
