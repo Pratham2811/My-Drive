@@ -7,6 +7,7 @@ import {
   uploadFiles,
   renameFile,
   deleteFile,
+  fetchGoogleDriveFiles,
 } from "./explorerThunk";
 
 const initialState = {
@@ -17,6 +18,9 @@ const initialState = {
   directories: [],
   loading: false,
   error: null,
+
+  // Source tracking: "local" or "gdrive"
+  activeSource: "local",
 
   // UI state
   searchQuery: "",
@@ -36,7 +40,7 @@ const explorerSlice = createSlice({
   name: "explorer",
   initialState,
   reducers: {
-    // Modal management   
+    // Modal management
     openModal: (state, action) => {
       const { modalName, item = null, itemType = "file" } = action.payload;
       state.modals[modalName] = true;
@@ -56,6 +60,11 @@ const explorerSlice = createSlice({
     // Search
     setSearchQuery: (state, action) => {
       state.searchQuery = action.payload;
+    },
+
+    // Source
+    setActiveSource: (state, action) => {
+      state.activeSource = action.payload;
     },
 
     // Clear errors
@@ -177,12 +186,38 @@ const explorerSlice = createSlice({
       .addCase(deleteFile.rejected, (state, action) => {
         state.actionLoading = false;
         state.error = action.payload || "Failed to delete file";
+      })
+
+      // ─── Google Drive Files ─────────────────────────
+      .addCase(fetchGoogleDriveFiles.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+        state.activeSource = "gdrive";
+      })
+      .addCase(fetchGoogleDriveFiles.fulfilled, (state, action) => {
+        const items = action.payload.googleDriveFiles;
+
+        state.directories = items.directories || [];
+        state.files = items.files || [];
+        state.directory = items.directory || null;
+        state.currentFolderId = items.directory?.id || null;
+        state.loading = false;
+      })
+      .addCase(fetchGoogleDriveFiles.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || "Failed to load Google Drive files";
       });
   },
 });
 
-export const { openModal, closeModal, closeAllModals, setSearchQuery, clearError } =
-  explorerSlice.actions;
+export const {
+  openModal,
+  closeModal,
+  closeAllModals,
+  setSearchQuery,
+  setActiveSource,
+  clearError,
+} = explorerSlice.actions;
 
 const explorerReducer = explorerSlice.reducer;
 export default explorerReducer;

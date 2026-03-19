@@ -1,29 +1,59 @@
+import IntegratedAppsModel from "../models/IntegratedAppsModel.js";
+import { refreshAccessToken } from "../utils/refreshAccessToken.js";
+
 export const googleDriveProvider = {
-  async listFiles(integration, driveParentId) {
-    const drivereadEndpointUrl = `https://www.googleapis.com/drive/v3/files`;
-    const currentTime = Math.round(Date.now() / 1000);
-    // console.log(currentTime>integration.tokenExpiry);
+  async listFiles(integration, folderId) {
+    console.log("folderID it is", folderId);
+
+    const parentId = folderId || "root";
+
+    let accessToken = integration.accessToken;
+
+    const url = `https://www.googleapis.com/drive/v3/files?q='${parentId}' in parents and trashed=false&fields=files(id,name,mimeType,size,createdTime,webViewLink)`;
+
+    let response = await fetch(url, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    // 🔥 Retry on 401
+    if (response.status === 401) {
+      const refreshed = await refreshAccessToken(integration);
+
+      accessToken = refreshed.accessToken;
+
+      await IntegratedAppsModel.findByIdAndUpdate(integration.id, {
+        accessToken,
+        tokenExpiry: new Date(Date.now() + refreshed.expiresIn * 1000),
+      });
+
+      response = await fetch(url, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+    }
+
+    if (!response.ok) {
+      const err = await response.text();
+      throw new Error(`Google API Error: ${err}`);
+    }
+
+    const data = await response.json();
+
+    const items = data.files || [];
+    
+
     const files = [];
     const directories = [];
 
-    const expiryTime = Math.round(
-      new Date(integration.tokenExpiry).getTime() / 1000,
-    );
-    console.log(currentTime > expiryTime);
-
-    const response = await fetch(drivereadEndpointUrl, {
-      headers: {
-        Authorization: `Bearer ${integration.accessToken}`,
-      },
-    });
-    const googleFiles = await response.json();
-    googleFiles.forEach((file) => {
+    items.forEach((file) => {
       if (file.mimeType === "application/vnd.google-apps.folder") {
         directories.push({
           id: file.id,
           name: file.name,
           provider: "google-drive",
-          createdAt: file.createdTime,
         });
       } else {
         files.push({
@@ -32,9 +62,15 @@ export const googleDriveProvider = {
           mimeType: file.mimeType,
           provider: "google-drive",
           size: file.size,
+          createdAt: file.createdAt,
+          viewLink: file.webViewLink,
         });
       }
     });
+
+    return { files, directories };
   },
-  downloadFiles() {},
+  async getFile(fileId){
+       
+  }
 };

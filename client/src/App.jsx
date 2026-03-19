@@ -49,6 +49,8 @@ function App() {
         <Route element={<ProtectedRoute />}>
           <Route path="/" element={<ExplorerPage />} />
           <Route path="/:dirId" element={<ExplorerPage />} />
+          <Route path="/gdrive" element={<ExplorerPage />} />
+          <Route path="/gdrive/:dirId" element={<ExplorerPage />} />
           <Route path="/user-profile" element={<ProfilePage />} />
           <Route path="/home" element={<DashboardPage />} />
         </Route>

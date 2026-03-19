@@ -1,7 +1,7 @@
 import React from "react";
 import { Download, Pencil, Trash2, FileText } from "lucide-react";
 import { getFileIcon, formatFileSize, formatFileDate } from "@/features/file/constants/file.constants";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { openModal } from "../explorerSlice";
 import { cn } from "@/lib/utils";
 
@@ -11,6 +11,8 @@ import { cn } from "@/lib/utils";
  */
 export const FileCard = ({ file, viewMode }) => {
     const dispatch = useDispatch();
+    const { activeSource } = useSelector((state) => state.explorer);
+    const isGoogleDrive = activeSource === "gdrive";
 
     const IconComponent = getFileIcon(file.mimeType || file.type) || FileText;
 
@@ -60,8 +62,8 @@ export const FileCard = ({ file, viewMode }) => {
 
                 <div className="w-16 flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                     <ActionBtn onClick={handleDownload} icon={Download} title="Download" />
-                    <ActionBtn onClick={handleRename} icon={Pencil} title="Rename" />
-                    <ActionBtn onClick={handleDelete} icon={Trash2} title="Delete" variant="danger" />
+                    {!isGoogleDrive && <ActionBtn onClick={handleRename} icon={Pencil} title="Rename" />}
+                    {!isGoogleDrive && <ActionBtn onClick={handleDelete} icon={Trash2} title="Delete" variant="danger" />}
                 </div>
             </div>
         );
@@ -75,8 +77,8 @@ export const FileCard = ({ file, viewMode }) => {
         >
             <div className="absolute top-3 right-3 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity z-10 bg-white/90 backdrop-blur-sm p-1 rounded-md shadow-sm border border-slate-100">
                 <ActionBtn onClick={handleDownload} icon={Download} title="Download" size="xs" />
-                <ActionBtn onClick={handleRename} icon={Pencil} title="Rename" size="xs" />
-                <ActionBtn onClick={handleDelete} icon={Trash2} title="Delete" variant="danger" size="xs" />
+                {!isGoogleDrive && <ActionBtn onClick={handleRename} icon={Pencil} title="Rename" size="xs" />}
+                {!isGoogleDrive && <ActionBtn onClick={handleDelete} icon={Trash2} title="Delete" variant="danger" size="xs" />}
             </div>
 
             <div className="flex-1 flex items-center justify-center py-4">

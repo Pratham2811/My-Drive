@@ -117,3 +117,22 @@ export const deleteFile = createAsyncThunk(
     }
   }
 );
+
+// ─── Google Drive Thunks ─────────────────────────────────────────────
+
+export const fetchGoogleDriveFiles = createAsyncThunk(
+  "explorer/fetchGoogleDriveFiles",
+  async (folderId = "", { rejectWithValue }) => {
+    try {
+      const url = folderId
+        ? `/integrations/google-drive/files/${folderId}`
+        : `/integrations/google-drive/files`;
+      const res = await api.get(url);
+      return res.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to load Google Drive files"
+      );
+    }
+  }
+);

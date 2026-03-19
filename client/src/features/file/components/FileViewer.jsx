@@ -27,7 +27,7 @@ export const FileViewer = ({ file, onClose, onDownload }) => {
     setIsLoading(true);
   }, [file.id]);
 
-  const fileUrl = `http://localhost:80/api/file/${file.id}`; // Ensure this ENV var matches your setup
+  const fileUrl = `http://localhost:80/api/file/${file.id}`;
   const FileIcon = getFileIcon(file.mimeType || file.type);
   
   // Helpers

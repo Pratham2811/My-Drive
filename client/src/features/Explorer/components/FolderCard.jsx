@@ -1,16 +1,23 @@
 import React from "react";
 import { Folder, Pencil, Trash2 } from "lucide-react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { openModal } from "../explorerSlice";
 
 export const FolderCard = ({ folder, viewMode }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { activeSource } = useSelector((state) => state.explorer);
+  const isGoogleDrive = activeSource === "gdrive";
 
   const handleClick = (e) => {
     e.preventDefault();
-    navigate(`/test/${folder.id}`);
+    // Navigate to the correct route based on source
+    if (isGoogleDrive) {
+      navigate(`/gdrive/${folder.id}`);
+    } else {
+      navigate(`/${folder.id}`);
+    }
   };
 
   const handleRename = (e) => {
@@ -46,22 +53,25 @@ export const FolderCard = ({ folder, viewMode }) => {
           </div>
         )}
 
-        <div className="w-16 flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-          <button
-            onClick={handleRename}
-            className="p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-md transition-colors"
-            title="Rename"
-          >
-            <Pencil size={14} />
-          </button>
-          <button
-            onClick={handleDelete}
-            className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors"
-            title="Delete"
-          >
-            <Trash2 size={14} />
-          </button>
-        </div>
+        {/* Only show edit actions for local files */}
+        {!isGoogleDrive && (
+          <div className="w-16 flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+            <button
+              onClick={handleRename}
+              className="p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-md transition-colors"
+              title="Rename"
+            >
+              <Pencil size={14} />
+            </button>
+            <button
+              onClick={handleDelete}
+              className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors"
+              title="Delete"
+            >
+              <Trash2 size={14} />
+            </button>
+          </div>
+        )}
       </div>
     );
   }
@@ -77,20 +87,23 @@ export const FolderCard = ({ folder, viewMode }) => {
           <Folder size={32} className="fill-indigo-50" />
         </div>
 
-        <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity -mr-2 -mt-2">
-          <button
-            onClick={handleRename}
-            className="p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-slate-100 rounded-md"
-          >
-            <Pencil size={14} />
-          </button>
-          <button
-            onClick={handleDelete}
-            className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-slate-100 rounded-md"
-          >
-            <Trash2 size={14} />
-          </button>
-        </div>
+        {/* Only show edit actions for local files */}
+        {!isGoogleDrive && (
+          <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity -mr-2 -mt-2">
+            <button
+              onClick={handleRename}
+              className="p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-slate-100 rounded-md"
+            >
+              <Pencil size={14} />
+            </button>
+            <button
+              onClick={handleDelete}
+              className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-slate-100 rounded-md"
+            >
+              <Trash2 size={14} />
+            </button>
+          </div>
+        )}
       </div>
 
       <div className="w-full mt-auto">

@@ -1,8 +1,8 @@
 import React, { useEffect, useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { useParams } from "react-router-dom";
-import { fetchDirectory } from "../explorerThunk";
-import { openModal } from "../explorerSlice";
+import { useParams, useLocation } from "react-router-dom";
+import { fetchDirectory, fetchGoogleDriveFiles } from "../explorerThunk";
+import { openModal, setActiveSource } from "../explorerSlice";
 import { EmptyState, ErrorState, LoadingState } from "@/shared";
 import { FolderList } from "./FolderList";
 import { FileList } from "./FileList";
@@ -12,13 +12,31 @@ import { ExplorerModals } from "./ExplorerModals";
 const ExplorerContent = () => {
   const dispatch = useDispatch();
   const { dirId } = useParams();
-  const { directories, files, error, loading, searchQuery } = useSelector(
-    (state) => state.explorer
-  );
+  const location = useLocation();
+  const { directories, files, error, loading, searchQuery, activeSource } =
+    useSelector((state) => state.explorer);
+
+  // Detect source from route
+  const isGoogleDrive = location.pathname.startsWith("/gdrive");
 
   useEffect(() => {
-    dispatch(fetchDirectory(dirId || ""));
-  }, [dirId, dispatch]);
+    if (isGoogleDrive) {
+      dispatch(setActiveSource("gdrive"));
+      dispatch(fetchGoogleDriveFiles(dirId || ""));
+    } else {
+      dispatch(setActiveSource("local"));
+      dispatch(fetchDirectory(dirId || ""));
+    }
+  }, [dirId, isGoogleDrive, dispatch]);
+
+  // Retry handler
+  const handleRetry = () => {
+    if (isGoogleDrive) {
+      dispatch(fetchGoogleDriveFiles(dirId || ""));
+    } else {
+      dispatch(fetchDirectory(dirId || ""));
+    }
+  };
 
   // Search filtering
   const filteredDirectories = useMemo(() => {
@@ -43,10 +61,7 @@ const ExplorerContent = () => {
     return (
       <div className="flex-1 flex items-center justify-center bg-slate-50 p-6">
         <div className="w-full max-w-md bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-          <ErrorState
-            error={error}
-            onRetry={() => dispatch(fetchDirectory(dirId || ""))}
-          />
+          <ErrorState error={error} onRetry={handleRetry} />
         </div>
       </div>
     );
@@ -68,13 +83,25 @@ const ExplorerContent = () => {
             <div className="h-[60vh] flex flex-col items-center justify-center">
               <EmptyState
                 type="folder"
-                title="No files found"
-                description="Upload files or create a folder to get started."
-                action={{
-                  label: "Upload Files",
-                  onClick: () =>
-                    dispatch(openModal({ modalName: "upload" })),
-                }}
+                title={
+                  isGoogleDrive
+                    ? "No files in Google Drive"
+                    : "No files found"
+                }
+                description={
+                  isGoogleDrive
+                    ? "This folder is empty."
+                    : "Upload files or create a folder to get started."
+                }
+                action={
+                  !isGoogleDrive
+                    ? {
+                        label: "Upload Files",
+                        onClick: () =>
+                          dispatch(openModal({ modalName: "upload" })),
+                      }
+                    : undefined
+                }
               />
             </div>
           ) : (
@@ -116,7 +143,8 @@ const ExplorerContent = () => {
         </div>
       </div>
 
-      <ExplorerModals />
+      {/* Only show modals for local source (CRUD is local-only) */}
+      {activeSource === "local" && <ExplorerModals />}
     </div>
   );
 };

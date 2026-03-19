@@ -14,13 +14,10 @@ export function buildSidebar(providers) {
 
   Object.entries(providers).forEach(([provider, config]) => {
     if (provider === "google-drive" && config.state === "connected") {
-      nav.push({
+      nav[0].items.push({
         title: "Google Drive",
+        url: "/gdrive",
         icon: Cloud,
-        items: [
-          { title: "My Drive", url: "/gdrive" },
-          { title: "Shared With Me", url: "/gdrive/shared" },
-        ],
       });
     }
   });
