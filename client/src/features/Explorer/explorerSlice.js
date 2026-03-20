@@ -46,6 +46,8 @@ const explorerSlice = createSlice({
       state.modals[modalName] = true;
       state.selectedItem = item;
       state.itemType = itemType;
+      
+      
     },
     closeModal: (state, action) => {
       const modalName = action.payload;

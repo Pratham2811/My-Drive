@@ -16,3 +16,14 @@ export async function getGoogleDriveFilesService(userId,folderId) {
   }
  return files;
 }
+export async function getGoogleDriveFileService(userId, fileId, range) {
+  const integration = await IntegratedAppsModel.findOne({
+    userId,
+    provider: "google-drive",
+    status: "connected",
+  });
+
+  const provider = providerRegistery["google-drive"];
+
+  return provider.getFile(integration, fileId, range);
+}

@@ -11,10 +11,10 @@ export const fetchDirectory = createAsyncThunk(
       return res.data;
     } catch (error) {
       return rejectWithValue(
-        error.response?.data?.message || "Failed to load directory"
+        error.response?.data?.message || "Failed to load directory",
       );
     }
-  }
+  },
 );
 
 export const createFolder = createAsyncThunk(
@@ -28,10 +28,10 @@ export const createFolder = createAsyncThunk(
       return data;
     } catch (error) {
       return rejectWithValue(
-        error.response?.data?.message || "Failed to create folder"
+        error.response?.data?.message || "Failed to create folder",
       );
     }
-  }
+  },
 );
 
 export const renameFolder = createAsyncThunk(
@@ -45,10 +45,10 @@ export const renameFolder = createAsyncThunk(
       return { ...data, folderId, newName };
     } catch (error) {
       return rejectWithValue(
-        error.response?.data?.message || "Failed to rename folder"
+        error.response?.data?.message || "Failed to rename folder",
       );
     }
-  }
+  },
 );
 
 export const deleteFolder = createAsyncThunk(
@@ -59,10 +59,10 @@ export const deleteFolder = createAsyncThunk(
       return { ...data, folderId };
     } catch (error) {
       return rejectWithValue(
-        error.response?.data?.message || "Failed to delete folder"
+        error.response?.data?.message || "Failed to delete folder",
       );
     }
-  }
+  },
 );
 
 // ─── File Thunks ─────────────────────────────────────────────────────
@@ -81,10 +81,10 @@ export const uploadFiles = createAsyncThunk(
       return data;
     } catch (error) {
       return rejectWithValue(
-        error.response?.data?.message || "Failed to upload files"
+        error.response?.data?.message || "Failed to upload files",
       );
     }
-  }
+  },
 );
 
 export const renameFile = createAsyncThunk(
@@ -98,10 +98,10 @@ export const renameFile = createAsyncThunk(
       return { ...data, fileId, newName };
     } catch (error) {
       return rejectWithValue(
-        error.response?.data?.message || "Failed to rename file"
+        error.response?.data?.message || "Failed to rename file",
       );
     }
-  }
+  },
 );
 
 export const deleteFile = createAsyncThunk(
@@ -112,10 +112,10 @@ export const deleteFile = createAsyncThunk(
       return { ...data, fileId };
     } catch (error) {
       return rejectWithValue(
-        error.response?.data?.message || "Failed to delete file"
+        error.response?.data?.message || "Failed to delete file",
       );
     }
-  }
+  },
 );
 
 // ─── Google Drive Thunks ─────────────────────────────────────────────
@@ -131,8 +131,24 @@ export const fetchGoogleDriveFiles = createAsyncThunk(
       return res.data;
     } catch (error) {
       return rejectWithValue(
-        error.response?.data?.message || "Failed to load Google Drive files"
+        error.response?.data?.message || "Failed to load Google Drive files",
       );
     }
-  }
+  },
+);
+
+export const getGoogleDriveFile = createAsyncThunk(
+  "explorer/getGoogleDriveFile",
+  async (fileId, { rejectWithValue }) => {
+    try {
+      const url = `/integrations/google-drive/file/${fileId}`;
+
+      const res = await api.get(url);
+      return res.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to load Google Drive file",
+      );
+    }
+  },
 );

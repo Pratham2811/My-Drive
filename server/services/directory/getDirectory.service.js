@@ -5,8 +5,6 @@ import User from "../../models/UserModel.js";
 import { AppError } from "../../utils/AppError.js";
 import { mapMongoId } from "../../utils/mapMongoId.js";
 export const getDirectoryService = async (directoryId, userId) => {
- console.log("this is dirId",directoryId);
- 
   console.log(userId);
   
   if (!directoryId) {

@@ -6,7 +6,10 @@ import {
 } from "../controllers/integration/googleDriveIntegration.controller.js";
 import checkAuth from "../middlewares/authMiddleware.js";
 import { getIntegrations } from "../controllers/integration/getIntegrationsInfo.controller.js";
-import { getGoogleDriveFilesController } from "../controllers/integration/getIntegrationFiles.controller.js";
+import {
+  getGoogleDriveFileController,
+  getGoogleDriveFilesController,
+} from "../controllers/integration/getIntegrationFiles.controller.js";
 
 const router = express.Router();
 
@@ -21,5 +24,14 @@ router.get(
   googleDriveIntegrationCallbackController,
 );
 router.get("/all", checkAuth, getIntegrations);
-router.get("/google-drive/files{/:folderId}", checkAuth,getGoogleDriveFilesController);
+router.get(
+  "/google-drive/files{/:folderId}",
+  checkAuth,
+  getGoogleDriveFilesController,
+);
+router.get(
+  "/google-drive/file{/:fileId}",
+  checkAuth,
+  getGoogleDriveFileController,
+);
 export default router;

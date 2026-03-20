@@ -1,10 +1,10 @@
+import axios from "axios";
 import IntegratedAppsModel from "../models/IntegratedAppsModel.js";
+import { AppError } from "../utils/AppError.js";
 import { refreshAccessToken } from "../utils/refreshAccessToken.js";
 
 export const googleDriveProvider = {
   async listFiles(integration, folderId) {
-    console.log("folderID it is", folderId);
-
     const parentId = folderId || "root";
 
     let accessToken = integration.accessToken;
@@ -43,7 +43,6 @@ export const googleDriveProvider = {
     const data = await response.json();
 
     const items = data.files || [];
-    
 
     const files = [];
     const directories = [];
@@ -70,7 +69,46 @@ export const googleDriveProvider = {
 
     return { files, directories };
   },
-  async getFile(fileId){
-       
-  }
+  async getFile(integration, fileId, range) {
+    let accessToken = integration.accessToken;
+
+    // 🔥 Step 1: get metadata
+    const meta = await axios.get(
+      `https://www.googleapis.com/drive/v3/files/${fileId}?fields=mimeType`,
+      {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      },
+    );
+
+    const mimeType = meta.data.mimeType;
+
+    // 🔥 Step 2: choose endpoint
+    let url;
+
+    if (mimeType.includes("google-apps")) {
+      url = `https://www.googleapis.com/drive/v3/files/${fileId}/export?mimeType=application/pdf`;
+    } else {
+      url = `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`;
+    }
+
+    // 🔥 Step 3: forward range
+    const headers = {
+      Authorization: `Bearer ${accessToken}`,
+    };
+
+    if (range) {
+      headers.Range = range;
+    }
+
+    // 🔥 Step 4: stream request
+    const response = await axios.get(url, {
+      responseType: "stream",
+      headers,
+    });
+
+    return {
+      stream: response.data,
+      headers: response.headers,
+    };
+  },
 };

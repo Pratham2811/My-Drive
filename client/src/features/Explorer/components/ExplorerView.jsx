@@ -42,14 +42,14 @@ const ExplorerContent = () => {
   const filteredDirectories = useMemo(() => {
     if (!searchQuery) return directories;
     return directories.filter((d) =>
-      d.name.toLowerCase().includes(searchQuery.toLowerCase())
+      d.name.toLowerCase().includes(searchQuery.toLowerCase()),
     );
   }, [directories, searchQuery]);
 
   const filteredFiles = useMemo(() => {
     if (!searchQuery) return files;
     return files.filter((f) =>
-      f.name.toLowerCase().includes(searchQuery.toLowerCase())
+      f.name.toLowerCase().includes(searchQuery.toLowerCase()),
     );
   }, [files, searchQuery]);
 
@@ -84,9 +84,7 @@ const ExplorerContent = () => {
               <EmptyState
                 type="folder"
                 title={
-                  isGoogleDrive
-                    ? "No files in Google Drive"
-                    : "No files found"
+                  isGoogleDrive ? "No files in Google Drive" : "No files found"
                 }
                 description={
                   isGoogleDrive
@@ -144,7 +142,7 @@ const ExplorerContent = () => {
       </div>
 
       {/* Only show modals for local source (CRUD is local-only) */}
-      {activeSource === "local" && <ExplorerModals />}
+      <ExplorerModals />
     </div>
   );
 };
