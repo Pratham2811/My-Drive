@@ -144,6 +144,8 @@ export const getGoogleDriveFile = createAsyncThunk(
       const url = `/integrations/google-drive/file/${fileId}`;
 
       const res = await api.get(url);
+      console.log(res.data);
+      
       return res.data;
     } catch (error) {
       return rejectWithValue(

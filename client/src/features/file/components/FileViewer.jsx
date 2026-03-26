@@ -42,7 +42,9 @@ export const FileViewer = ({ file, onClose, onDownload }) => {
     setIsLoading(true);
   }, [file.id]);
 
-  let fileUrl = `http://localhost:80/api/file/${file.id}`;
+  let fileUrl = isGoogleDrive
+    ? `http://localhost:80/api/integrations/google-drive/file/${file.id}`
+    : `http://localhost:80/api/file/${file.id}`;
   const FileIcon = getFileIcon(file.mimeType || file.type);
 
   // Helpers
@@ -50,6 +52,7 @@ export const FileViewer = ({ file, onClose, onDownload }) => {
   const isPDF = file.mimeType === "application/pdf";
   const isVideo = file.mimeType?.startsWith("video/");
   const isAudio = file.mimeType?.startsWith("audio/");
+  console.log(isImage, isAudio, isPDF, isVideo);
 
   const handleZoomIn = () => setZoom((prev) => Math.min(prev + 25, 300));
   const handleZoomOut = () => setZoom((prev) => Math.max(prev - 25, 25));
@@ -70,6 +73,9 @@ export const FileViewer = ({ file, onClose, onDownload }) => {
   // Render Logic
   const renderContent = () => {
     if (isImage) {
+      console.log("Image it is");
+      console.log(file.id);
+
       return (
         <div
           className="relative transition-all duration-300 ease-out"
@@ -81,9 +87,7 @@ export const FileViewer = ({ file, onClose, onDownload }) => {
             </div>
           )}
           <img
-            src={
-              isGoogleDrive ? dispatch(getGoogleDriveFile(file.id)) : fileUrl
-            }
+            src={fileUrl}
             alt={file.name}
             onLoad={() => setIsLoading(false)}
             className="max-w-full max-h-[80vh] object-contain shadow-2xl rounded-md"
@@ -95,7 +99,7 @@ export const FileViewer = ({ file, onClose, onDownload }) => {
     if (isPDF) {
       return (
         <iframe
-          src={isGoogleDrive ? dispatch(getGoogleDriveFile(file.id)) : fileUrl}
+          src={fileUrl}
           className="w-full h-full max-w-5xl rounded-lg bg-white shadow-2xl"
           title={file.name}
         />
@@ -105,7 +109,7 @@ export const FileViewer = ({ file, onClose, onDownload }) => {
     if (isVideo) {
       return (
         <video
-          src={isGoogleDrive ? dispatch(getGoogleDriveFile(file.id)) : fileUrl}
+          src={fileUrl}
           controls
           autoPlay
           className="max-w-full max-h-[80vh] rounded-lg shadow-2xl outline-none"
@@ -125,13 +129,7 @@ export const FileViewer = ({ file, onClose, onDownload }) => {
           <p className="text-slate-400 text-sm mb-6">
             {formatFileSize(file.size)}
           </p>
-          <audio
-            src={
-              isGoogleDrive ? dispatch(getGoogleDriveFile(file.id)) : fileUrl
-            }
-            controls
-            className="w-full min-w-[300px]"
-          />
+          <audio src={fileUrl} controls className="w-full min-w-[300px]" />
         </div>
       );
     }

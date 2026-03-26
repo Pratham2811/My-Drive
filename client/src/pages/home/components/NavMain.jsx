@@ -23,7 +23,7 @@ import { useSelector } from "react-redux";
 export function NavMain() {
   const integrations = useSelector((state) => state.integratedApps);
   const items = buildSidebar(integrations.providers);
-  console.log(items);
+
 
   return (
     <SidebarMenu>

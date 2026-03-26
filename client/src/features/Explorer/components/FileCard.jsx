@@ -31,7 +31,7 @@ export const FileCard = ({ file, viewMode }) => {
   const handleDownload = (e) => {
     e?.stopPropagation();
     window.open(
-      `http://localhost:80/file/${file.id}?action=download`,
+      `http://localhost:80/api/file/${file.id}?action=download`,
       "_blank",
     );
   };
