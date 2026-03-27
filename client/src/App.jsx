@@ -12,6 +12,7 @@ import { useEffect, useState } from "react";
 import DashboardPage from "./pages/home/HomePage2";
 import ExplorerPage from "./pages/ExplorerPage";
 import ProtectedRoute from "./ProtectedRoute";
+import UserManagementPage from "./pages/UserManagmentPage";
 
 function App() {
   const dispatch = useDispatch();
@@ -53,6 +54,7 @@ function App() {
           <Route path="/gdrive/:dirId" element={<ExplorerPage />} />
           <Route path="/user-profile" element={<ProfilePage />} />
           <Route path="/home" element={<DashboardPage />} />
+          <Route path="/users" element={<UserManagementPage />} />
         </Route>
       </Routes>
     </BrowserRouter>
