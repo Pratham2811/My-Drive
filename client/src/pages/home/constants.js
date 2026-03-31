@@ -1,4 +1,4 @@
-import { Cloud, HardDrive, FolderOpen, Trash2 } from "lucide-react";
+import { Cloud, HardDrive, FolderOpen, Trash2, ShieldUser } from "lucide-react";
 
 export function buildSidebar(providers) {
   const nav = [
@@ -11,7 +11,6 @@ export function buildSidebar(providers) {
       ],
     },
   ];
-
   Object.entries(providers).forEach(([provider, config]) => {
     if (provider === "google-drive" && config.state === "connected") {
       nav[0].items.push({

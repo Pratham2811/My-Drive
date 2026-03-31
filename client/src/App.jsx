@@ -9,10 +9,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { getUser } from "./features/auth/thunks/sessionThunk";
 import { getIntegrationsInfo } from "./features/appIntegrations/slice/integrationThunk";
 import { useEffect, useState } from "react";
-import DashboardPage from "./pages/home/HomePage2";
 import ExplorerPage from "./pages/ExplorerPage";
 import ProtectedRoute from "./ProtectedRoute";
 import UserManagementPage from "./pages/UserManagmentPage";
+import { Spinner } from "./shared/components/ui/Spinner";
+import ExplorerView from "./features/Explorer/components/ExplorerView";
 
 function App() {
   const dispatch = useDispatch();
@@ -34,7 +35,7 @@ function App() {
   }, []);
 
   if (!appReady) {
-    return <div>Loading...</div>;
+    return <Spinner />;
   }
 
   return (
@@ -48,13 +49,19 @@ function App() {
 
         {/* protected routes */}
         <Route element={<ProtectedRoute />}>
-          <Route path="/" element={<ExplorerPage />} />
-          <Route path="/:dirId" element={<ExplorerPage />} />
-          <Route path="/gdrive" element={<ExplorerPage />} />
-          <Route path="/gdrive/:dirId" element={<ExplorerPage />} />
-          <Route path="/user-profile" element={<ProfilePage />} />
-          <Route path="/home" element={<DashboardPage />} />
-          <Route path="/users" element={<UserManagementPage />} />
+          <Route path="/" element={<ExplorerPage />}>
+            {/* Explorer */}
+            <Route index element={<ExplorerView />} />
+            <Route path=":dirId" element={<ExplorerView />} />
+
+            {/* Google Drive */}
+            <Route path="gdrive" element={<ExplorerView />} />
+            <Route path="gdrive/:dirId" element={<ExplorerView />} />
+
+            {/* Other Pages */}
+            <Route path="user-profile" element={<ProfilePage />} />
+            <Route path="admin/users" element={<UserManagementPage />} />
+          </Route>
         </Route>
       </Routes>
     </BrowserRouter>

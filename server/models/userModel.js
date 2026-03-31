@@ -33,6 +33,11 @@ const UserSchema = new Schema(
       required: true,
       immutable: true,
     },
+    role: {
+      type: String,
+      enum: ["User", "Manager", "Admin"],
+      default: "User",
+    },
 
     storage: {
       type: Number,

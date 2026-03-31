@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import * as React from "react"
+import * as React from "react";
 import {
   FolderOpen,
   Trash2,
@@ -9,7 +9,7 @@ import {
   Cloud,
   Settings2,
   HardDrive,
-} from "lucide-react"
+} from "lucide-react";
 
 import {
   Sidebar,
@@ -22,31 +22,29 @@ import {
   SidebarGroupContent,
   SidebarMenu,
   SidebarMenuItem,
-} from "@/components/ui/sidebar"
+  SidebarMenuButton,
+} from "@/components/ui/sidebar";
 
-
-import { NavMain } from "./NavMain"
-import { NavUser } from "./NavUser"
-import IntegrationsManager from "@/features/appIntegrations/components/IntergrationManager"
-import { useSelector } from "react-redux"
+import { NavMain } from "./NavMain";
+import { NavUser } from "./NavUser";
+import IntegrationsManager from "@/features/appIntegrations/components/IntergrationManager";
+import { useSelector } from "react-redux";
+import { Link } from "react-router-dom";
 
 // CloudMemories tailored data
 
-const data = {
- 
-  navMain: [
-   
-  ],
-}
-
 export function AppSidebar({ ...props }) {
-    const {user}=useSelector((state)=>state.auth);
-   
-    
-    data.user=user.user
-  return (
-    <Sidebar collapsible="icon" {...props} className="border-r border-slate-200 bg-white shadow-sm">
+  const { user } = useSelector((state) => state.auth);
 
+  // FIX: handle nested structure safely
+  const role = user?.role || user?.user?.role;
+
+  return (
+    <Sidebar
+      collapsible="icon"
+      {...props}
+      className="border-r border-slate-200 bg-white shadow-sm"
+    >
       {/* 1. Custom Brand Header */}
       <SidebarHeader className="h-16 flex justify-center border-b border-slate-100">
         <div className="flex items-center gap-3 px-2 overflow-hidden">
@@ -79,6 +77,28 @@ export function AppSidebar({ ...props }) {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
+        {role === "Admin" && (
+          <SidebarGroup className="group-data-[collapsible=icon]:hidden mt-4">
+            <SidebarGroupLabel className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
+              Admin
+            </SidebarGroupLabel>
+
+            <SidebarGroupContent>
+              <SidebarMenu>
+                <SidebarMenuItem>
+                  <SidebarMenuButton asChild>
+                    <Link
+                      to="/admin/users"
+                      className="flex items-center gap-2 text-slate-700 hover:bg-slate-100"
+                    >
+                      <span>User Management</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
       </SidebarContent>
 
       {/* 3. User Profile Footer */}
@@ -88,5 +108,5 @@ export function AppSidebar({ ...props }) {
 
       <SidebarRail />
     </Sidebar>
-  )
+  );
 }

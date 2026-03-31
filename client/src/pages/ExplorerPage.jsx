@@ -17,13 +17,14 @@ import { AppSidebar } from "./home/components/AppSidebar";
 import ExplorerView from "@/features/Explorer/components/ExplorerView";
 import { useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
-
+import { Outlet } from "react-router-dom";
 export default function ExplorerPage() {
   const { directory } = useSelector((state) => state.explorer);
   const location = useLocation();
   const isGoogleDrive = location.pathname.startsWith("/gdrive");
 
-  const folderName = directory?.name || (isGoogleDrive ? "My Drive" : "My Files");
+  const folderName =
+    directory?.name || (isGoogleDrive ? "My Drive" : "My Files");
   const rootLabel = isGoogleDrive ? "Google Drive" : "Workspace";
   const rootUrl = isGoogleDrive ? "/gdrive" : "/test";
 
@@ -65,7 +66,7 @@ export default function ExplorerPage() {
 
         {/* Main Content Area */}
         <div className="flex flex-1 flex-col w-full h-[calc(100vh-4rem)] overflow-hidden">
-          <ExplorerView />
+          <Outlet />
         </div>
       </SidebarInset>
     </SidebarProvider>

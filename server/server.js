@@ -9,7 +9,7 @@ import cookieParser from "cookie-parser";
 import checkAuth from "./middlewares/authMiddleware.js";
 import "./config/db.js";
 import dotenv from "dotenv";
-
+import adminRoutes from "./routes/adminRoutes.js"
 
 dotenv.config();
 const app = express();
@@ -29,7 +29,7 @@ try {
   app.use("/api/file", checkAuth, filesroute);
   app.use("/api/auth", authRoutes);
   app.use("/api/integrations",integrationRoutes)
-
+  app.use("/api/admin",adminRoutes)
 
   app.use((error, req, res, next) => {
 
