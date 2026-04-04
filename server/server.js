@@ -6,11 +6,11 @@ import filesroute from "./routes/filesroute.js";
 import authRoutes from "./routes/authRoutes.js";
 import integrationRoutes from "./routes/integrationRoutes.js";
 import cookieParser from "cookie-parser";
-import checkAuth from "./middlewares/authMiddleware.js";
+import checkAuth from "./middlewares/auth.middleware.js";
 import "./config/db.js";
 import dotenv from "dotenv";
 import adminRoutes from "./routes/adminRoutes.js"
-
+import "./seedData.js"
 dotenv.config();
 const app = express();
 try {

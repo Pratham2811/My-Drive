@@ -33,7 +33,6 @@ const LoginForm = () => {
      
       
       const response = await dispatch(googleLogin()).unwrap();
-
       window.location.href = response.data;
     } catch (error) {
       toast.error(error);

@@ -7,12 +7,12 @@ import bcrypt from "bcrypt";
 import { AuthProvider } from "../../models/AuthProvider.js";
 
 export const loginUserService = async (email, password) => {
-  const user = await User.findOne({ email: email })
+  const user = await User.findOne({ email: email, state: "ACTIVE" })
     .lean()
     .select("name email password");
 
   if (!user) {
-    throw new AppError("User Not Found", 404);
+    throw new AppError("User Not Found or Suspended", 404);
   }
 
   const authProvider = await AuthProvider.findOne({

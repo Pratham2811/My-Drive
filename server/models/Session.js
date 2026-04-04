@@ -7,11 +7,12 @@ const sessionSchema = new Schema(
       ref: "Directory",
       required: true,
       immutable: true,
+      index: true,
     },
-    email:{
-      type:String,
-      required:true,
-      trim:true
+    email: {
+      type: String,
+      required: true,
+      trim: true,
     },
 
     state: {
@@ -19,17 +20,17 @@ const sessionSchema = new Schema(
       enum: ["ACTIVE", "DELETED", "SUSPENDED"],
       default: "ACTIVE",
     },
-    createdAt:{
-        type:   Date,
-        default:Date.now,
-        expires:3600*24,
-    }
+    createdAt: {
+      type: Date,
+      default: Date.now,
+      expires: 3600 * 24,
+    },
   },
   {
     strict: "throw",
     timestamps: true,
-  }
+  },
 );
 
 const Session = model("Session", sessionSchema);
-export default Session; 
+export default Session;

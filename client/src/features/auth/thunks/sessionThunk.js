@@ -17,9 +17,9 @@ export const getUser = createAsyncThunk(
 );
 export const logOut = createAsyncThunk(
   "auth/logOut",
-  async (_, { rejectWithValue }) => {
+  async (id, { rejectWithValue }) => {
     try {
-      const res = await api.post("/auth/logout");
+      const res = await api.post("/auth/logout",id);
 
       return res.data;
     } catch (error) {

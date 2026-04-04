@@ -5,6 +5,7 @@ import User from "../../models/UserModel.js";
 import { getGithubAccessToken } from "../../utils/getGithubAccessToken.js";
 import { getGithubUser } from "../../utils/getGithubUserInfo.js";
 import { directoryModel } from "../../models/DirectoryModel.js";
+import { userActiveCheck } from "../../middlewares/activeUserCheck.js";
 
 export const githubAuthCallbackController = async (req, res, next) => {
   const { code } = req.query;
@@ -22,7 +23,7 @@ export const githubAuthCallbackController = async (req, res, next) => {
     const { id, name, email, avatar_url } = await getGithubUser(accessToken);
 
     let provider = await AuthProvider.findOne({
-      provider: "github",
+      provider: "github  ",
       providerUserId: id,
     }).session(transactionSession);
 
@@ -30,6 +31,7 @@ export const githubAuthCallbackController = async (req, res, next) => {
 
     if (provider) {
       user = await User.findById(provider.userId).session(transactionSession);
+      userActiveCheck(user);
     } else {
       user = await User.findOne({ email }).session(transactionSession);
 
@@ -115,7 +117,7 @@ export const githubAuthCallbackController = async (req, res, next) => {
 
     await transactionSession.commitTransaction();
 
-    res.cookie("sessionId",user.id, {
+    res.cookie("sessionId", user.id, {
       httpOnly: true,
       signed: true,
       maxAge: 1000 * 60 * 60 * 24 * 7,
@@ -124,7 +126,17 @@ export const githubAuthCallbackController = async (req, res, next) => {
     return res.redirect("http://localhost:5173/");
   } catch (error) {
     await transactionSession.abortTransaction();
-   return res.redirect("http://localhost:5173/login");
+    if (
+      error.statusCode === 400 &&
+      error.message.includes("User is suspended")
+    ) {
+      return res.redirect(`${process.env.CLIENT_URL}/login?error=server`);
+    } else {
+      return res.status(error.status || 500).json({
+        success: false,
+        message: error.message || "Internal Server Error",
+      });
+    }
   } finally {
     transactionSession.endSession();
   }

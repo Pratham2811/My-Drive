@@ -5,6 +5,8 @@ import crypto from "crypto";
 import dotenv from "dotenv";
 import { log } from "console";
 import Session from "../models/Session.js";
+import { getPermissions } from "../services/permissions/permission.service.js";
+import { Role } from "../models/role.model.js";
 dotenv.config();
 export default async function checkAuth(req, res, next) {
   try {
@@ -38,8 +40,16 @@ export default async function checkAuth(req, res, next) {
     }
 
     // 4. Normalize AFTER existence check
-    req.user = mapMongoId(userDoc);
+    const role = await Role.findOne({ name: userDoc.role });
+    const permissions = await getPermissions(role._id);
 
+    req.user = {
+      ...userDoc,
+      permissions,
+    };
+    req.user = mapMongoId(req.user);
+  
+ 
     next();
   } catch (err) {
     next(err); // delegate to global error handler

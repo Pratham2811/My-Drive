@@ -4,7 +4,7 @@ import {
   googleDriveIntegrationCallbackController,
   googleDriveIntegrationController,
 } from "../controllers/integration/googleDriveIntegration.controller.js";
-import checkAuth from "../middlewares/authMiddleware.js";
+import checkAuth from "../middlewares/auth.middleware.js";
 import { getIntegrations } from "../controllers/integration/getIntegrationsInfo.controller.js";
 import {
   getGoogleDriveFileController,

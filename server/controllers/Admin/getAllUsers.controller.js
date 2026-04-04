@@ -6,12 +6,13 @@ export async function getAllUsersController(req, res, next) {
     const { users, allSession } = await getAllUsersService();
 
     const transformedUsers = users.map(
-      ({ _id, name, state, createdAt, avatarUrl, email }) => {
+      ({ _id, name, state, createdAt, avatarUrl, email,role }) => {
         return {
           id: _id,
           name,
           email,
           state,
+          role,
           createdAt,
           avatarUrl,
           isLoggedIn: allSession.some((session) => {
@@ -20,6 +21,7 @@ export async function getAllUsersController(req, res, next) {
         };
       },
     );
+
     
     res.status(200).json({
       success: true,

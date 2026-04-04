@@ -97,7 +97,7 @@ export const ExplorerModals = () => {
   const handleDownloadFile = () => {
     if (selectedItem) {
       window.open(
-        `http://localhost:80/file/${selectedItem.id}?action=download`,
+        `http://localhost:80/api/file/${selectedItem.id}?action=download`,
         "_blank",
       );
     }

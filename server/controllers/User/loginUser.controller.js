@@ -16,6 +16,7 @@ export const loginUserController = async (req, res, next) => {
         message: "user not found",
       });
     }
+    
     const exsistingSessionCount = await Session.countDocuments({
       userId: user.id,
     });

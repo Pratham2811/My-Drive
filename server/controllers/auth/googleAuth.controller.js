@@ -5,6 +5,7 @@ import User from "../../models/UserModel.js";
 import mongoose from "mongoose";
 import { directoryModel } from "../../models/DirectoryModel.js";
 import { AuthProvider } from "../../models/AuthProvider.js";
+import { userActiveCheck } from "../../middlewares/activeUserCheck.js";
 dotenv.config();
 const client = new OAuth2Client({
   client_id: process.env.CLIENT_ID,
@@ -35,7 +36,7 @@ export async function googleAuthController(req, res) {
     console.log(error);
   }
 }
-export async function googleAuthCallbackController(req, res) {
+export async function googleAuthCallbackController(req, res, next) {
   try {
     const { code } = req.query;
     if (!code) {
@@ -67,9 +68,10 @@ export async function googleAuthCallbackController(req, res) {
 
     if (provider) {
       user = await User.findById(provider.userId);
+      userActiveCheck(user);
     } else {
       user = await User.findOne({ email });
-
+      userActiveCheck(user);
       if (user) {
         provider = await AuthProvider.create({
           userId: user._id,
@@ -132,10 +134,16 @@ export async function googleAuthCallbackController(req, res) {
     });
     return res.redirect(`http://localhost:5173/`);
   } catch (error) {
-    console.error(error);
-    return res.status(500).json({
-      success: false,
-      message: "Internal Server Error",
-    });
+    if (
+      error.statusCode === 400 &&
+      error.message.includes("User is suspended")
+    ) {
+      return res.redirect(`${process.env.CLIENT_URL}/login?error=server`);
+    } else {
+      return res.status(error.status || 500).json({
+        success: false,
+        message: error.message || "Internal Server Error",
+      });
+    }
   }
 }

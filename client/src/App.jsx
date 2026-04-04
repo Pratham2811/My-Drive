@@ -14,6 +14,7 @@ import ProtectedRoute from "./ProtectedRoute";
 import UserManagementPage from "./pages/UserManagmentPage";
 import { Spinner } from "./shared/components/ui/Spinner";
 import ExplorerView from "./features/Explorer/components/ExplorerView";
+import AdminRoute from "./utils/AdminRoute";
 
 function App() {
   const dispatch = useDispatch();
@@ -60,7 +61,9 @@ function App() {
 
             {/* Other Pages */}
             <Route path="user-profile" element={<ProfilePage />} />
-            <Route path="admin/users" element={<UserManagementPage />} />
+            <Route element={<AdminRoute />}>
+              <Route path="admin/users" element={<UserManagementPage />} />
+            </Route>
           </Route>
         </Route>
       </Routes>

@@ -2,7 +2,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  viewMode: "list",
+  viewMode: "grid",
 };
 const preferenceSlice = createSlice({
   name: "userPreference",

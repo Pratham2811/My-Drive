@@ -3,7 +3,7 @@ import { validateIdMiddleware } from "../middlewares/validateIdMiddleware.js";
 import { getFileController } from "../controllers/file/getFile.controller.js";
 import { uploadFileController } from "../controllers/file/uploadFile.controller.js";
 import { upload } from "../middlewares/multer.middleware.js";
-import checkAuth from "../middlewares/authMiddleware.js";
+import checkAuth from "../middlewares/auth.middleware.js";
 import { deleteFileController } from "../controllers/file/deleteFile.controller.js";
 import { editFileController } from "../controllers/file/editFile.controller.js";
 const router = express.Router();
