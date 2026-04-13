@@ -1,12 +1,12 @@
-// // import { Permission } from "./models/permission.model.js";
-// // import { Role } from "./models/role.model.js";
+// import { Permission } from "./models/permission.model.js";
+// import { Role } from "./models/role.model.js";
 
-// // const insertData = await Role.create([
-// //  { name: "ADMIN" },
-// //   { name: "MANAGER" },
-// //   { name: "USER" }
-// // ]);
-// // console.log(insertData);
+// const insertData = await Role.create([
+//  { name: "ADMIN" },
+//   { name: "MANAGER" },
+//   { name: "USER" }
+// ]);
+// console.log(insertData);
 
 // // seedRolePermissions.js
 

@@ -4,11 +4,12 @@ import {
   softDeleteUserService,
   suspendUserService,
 } from "../../services/admin/adminAction.service.js";
+import { avoidUserSelftDeletion } from "../../utils/avoidSelfDeletion.js";
 
 export async function LogoutUserController(req, res, next) {
   try {
     const { userId } = req.body;
-
+    avoidUserSelftDeletion(userId, req, "logout");
     // users.forEach(async (user) => {
     //   await Session.deleteMany({ userId: user.id });
     // });
@@ -24,6 +25,7 @@ export async function LogoutUserController(req, res, next) {
 export async function suspendUserController(req, res, next) {
   try {
     const { userId } = req.body;
+    avoidUserSelftDeletion(userId, req, "suspend");
     const suspendedUser = await suspendUserService(userId);
     return res.status(200).json({
       success: true,
@@ -65,8 +67,8 @@ export async function reactivateUserController(req, res) {
 export async function softDeleteUserController(req, res) {
   try {
     const { userId } = req.params;
-console.log(userId);
 
+    avoidUserSelftDeletion(userId, req, "delete");
     if (!userId) {
       return res.status(400).json({
         success: false,

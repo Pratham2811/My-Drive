@@ -11,6 +11,7 @@ dotenv.config();
 export default async function checkAuth(req, res, next) {
   try {
     const { sessionId } = req.signedCookies;
+
     if (!sessionId) {
       return res.status(401).json({
         success: false,
@@ -38,18 +39,9 @@ export default async function checkAuth(req, res, next) {
     if (!userDoc) {
       return res.status(401).json({ error: "User not found" });
     }
-
-    // 4. Normalize AFTER existence check
-    const role = await Role.findOne({ name: userDoc.role });
-    const permissions = await getPermissions(role._id);
-
-    req.user = {
-      ...userDoc,
-      permissions,
-    };
-    req.user = mapMongoId(req.user);
-  
- 
+    req.user = mapMongoId(userDoc);
+    
+    
     next();
   } catch (err) {
     next(err); // delegate to global error handler

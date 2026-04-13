@@ -6,6 +6,8 @@ import crypto from "crypto";
 import bcrypt from "bcrypt";
 import dotenv from "dotenv";
 import { AuthProvider } from "../../models/AuthProvider.js";
+import { openFga } from "../../permissions/openFgaClient.js";
+import { addAccess } from "../../permissions/writePermissionTuple.js";
 dotenv.config();
 export const registerUserService = async (username, email, password) => {
   const session = await mongoose.startSession();
@@ -61,8 +63,9 @@ export const registerUserService = async (username, email, password) => {
       ],
       { session },
     );
-    await session.commitTransaction();
 
+    await session.commitTransaction();
+    await addAccess(userId, "owner", "folder", rootDirId);
     return { userId, rootDirId };
   } catch (error) {
     await session.abortTransaction();

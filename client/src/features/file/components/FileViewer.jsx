@@ -76,7 +76,7 @@ export const FileViewer = ({ file, onClose, onDownload }) => {
 
     if (isPDF) {
       return (
-        <iframe
+        <embed
           src={fileUrl}
           className="w-full h-full max-w-5xl rounded-lg bg-white shadow-2xl"
           title={file.name}

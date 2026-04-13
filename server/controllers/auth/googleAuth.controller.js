@@ -6,6 +6,7 @@ import mongoose from "mongoose";
 import { directoryModel } from "../../models/DirectoryModel.js";
 import { AuthProvider } from "../../models/AuthProvider.js";
 import { userActiveCheck } from "../../middlewares/activeUserCheck.js";
+import { addAccess } from "../../permissions/writePermissionTuple.js";
 dotenv.config();
 const client = new OAuth2Client({
   client_id: process.env.CLIENT_ID,
@@ -15,7 +16,7 @@ const client = new OAuth2Client({
 export async function googleAuthController(req, res) {
   try {
     const { sessionId } = req.signedCookies;
-    console.log(sessionId);
+
     if (sessionId) {
       return res.status(409).json({
         success: false,
@@ -39,6 +40,8 @@ export async function googleAuthController(req, res) {
 export async function googleAuthCallbackController(req, res, next) {
   try {
     const { code } = req.query;
+    let shouldAssignFga = false;
+    let fgaUserId, fgaRootDirId;
     if (!code) {
       return res.redirect("http://localhost:5173/login");
     }
@@ -65,7 +68,6 @@ export async function googleAuthCallbackController(req, res, next) {
     });
 
     let user;
-
     if (provider) {
       user = await User.findById(provider.userId);
       userActiveCheck(user);
@@ -109,7 +111,9 @@ export async function googleAuthCallbackController(req, res, next) {
         });
       }
     }
-
+    if (shouldAssignFga) {
+      await addAccess(fgaUserId, "owner", "folder", fgaRootDirId);
+    }
     const sessionCount = await Session.countDocuments({
       userId: user._id,
     });

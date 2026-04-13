@@ -5,8 +5,11 @@ import { AppError } from "../../utils/AppError.js";
 import Otp from "../../models/OtpModel.js";
 import { AuthProvider } from "../../models/AuthProvider.js";
 import IntegratedAppsModel from "../../models/IntegratedAppsModel.js";
+import FileModel from "../../models/FileModel.js";
+import { directoryModel } from "../../models/DirectoryModel.js";
 
 export async function suspendUserService(userId) {
+  
   const session = await mongoose.startSession();
 
   try {
@@ -39,6 +42,12 @@ export async function reactivateUserService(userId) {
     }
     user.state = "ACTIVE";
     await user.save({ session });
+    await FileModel.updateMany({ userId }, { state: "ACTIVE" }).session(
+      session,
+    );
+    await directoryModel
+      .updateMany({ userId }, { state: "DELETED" })
+      .session(session);
     await session.commitTransaction();
     return user;
   } catch (error) {
@@ -57,14 +66,20 @@ export async function softDeleteUserService(userId) {
       throw new Error("User not found");
     }
     console.log(user);
-    
+
     if (user.state === "DISABLED") {
       throw new Error("User already deleted");
     }
     await Session.deleteMany({ userId }).session(session);
     await Otp.deleteMany({ userId }).session(session);
     await AuthProvider.deleteMany({ userId }).session(session);
-    await IntegratedAppsModel.deleteMany({ userId });
+    await IntegratedAppsModel.deleteMany({ userId }).session(session);
+    await FileModel.updateMany({ userId }, { state: "DELETED" }).session(
+      session,
+    );
+    await directoryModel
+      .updateMany({ userId }, { state: "DELETED" })
+      .session(session);
     user.state = "DISABLED";
     user.deletedAt = new Date();
     await user.save({ session });

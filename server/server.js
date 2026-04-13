@@ -11,6 +11,7 @@ import "./config/db.js";
 import dotenv from "dotenv";
 import adminRoutes from "./routes/adminRoutes.js"
 import "./seedData.js"
+import "./permissions/openFgaClient.js"
 dotenv.config();
 const app = express();
 try {
@@ -34,10 +35,10 @@ try {
   app.use((error, req, res, next) => {
 
     if (error.code === 121) {
-      // This will print the FULL validation error details
+   
       console.dir(error.errInfo, { depth: null, colors: true })
     }
-    console.log(error);
+   
 
     res.status(error.status || 500).json({
       status: "error",

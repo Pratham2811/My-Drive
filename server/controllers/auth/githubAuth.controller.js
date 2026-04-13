@@ -6,6 +6,7 @@ import { getGithubAccessToken } from "../../utils/getGithubAccessToken.js";
 import { getGithubUser } from "../../utils/getGithubUserInfo.js";
 import { directoryModel } from "../../models/DirectoryModel.js";
 import { userActiveCheck } from "../../middlewares/activeUserCheck.js";
+import { addAccess } from "../../permissions/writePermissionTuple.js";
 
 export const githubAuthCallbackController = async (req, res, next) => {
   const { code } = req.query;
@@ -18,12 +19,13 @@ export const githubAuthCallbackController = async (req, res, next) => {
 
   try {
     transactionSession.startTransaction();
-
+    let shouldAssignFga = false;
+    let fgaUserId, fgaRootDirId;
     const accessToken = await getGithubAccessToken(code);
     const { id, name, email, avatar_url } = await getGithubUser(accessToken);
 
     let provider = await AuthProvider.findOne({
-      provider: "github  ",
+      provider: "github",
       providerUserId: id,
     }).session(transactionSession);
 
@@ -92,6 +94,9 @@ export const githubAuthCallbackController = async (req, res, next) => {
           ],
           { session: transactionSession },
         );
+        shouldAssignFga = true;
+        fgaRootDirId = rootDirId;
+        fgaUserId = userId;
       }
     }
 
@@ -116,6 +121,9 @@ export const githubAuthCallbackController = async (req, res, next) => {
     );
 
     await transactionSession.commitTransaction();
+    if (shouldAssignFga) {
+      await addAccess(fgaUserId, "owner", "folder", fgaRootDirId);
+    }
 
     res.cookie("sessionId", user.id, {
       httpOnly: true,

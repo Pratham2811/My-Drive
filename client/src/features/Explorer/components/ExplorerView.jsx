@@ -69,8 +69,6 @@ const ExplorerContent = () => {
 
   return (
     <div className="flex-1 flex flex-col h-full bg-slate-50/50">
-      <ExplorerHeader />
-
       {/* Main Scrollable Area */}
       <div className="flex-1 overflow-y-auto">
         <div className="p-6 sm:p-8 max-w-[1600px] mx-auto w-full min-h-full">

@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "@openfga/sdk": "^0.9.5",
     "cookie-parser": "^1.4.7",
     "mongo": "^0.1.0",
     "mongoose": "^9.0.2"
