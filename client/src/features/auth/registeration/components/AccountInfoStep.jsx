@@ -1,12 +1,15 @@
+import { useMemo, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { Check, LockKeyhole, User } from "lucide-react";
+import { toast } from "sonner";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { toast } from "sonner";
 import { createAccount } from "../../thunks/registrationThunks";
-import { useNavigate } from "react-router-dom";
 import { updateFormData } from "../../slices/authSlice";
+import { cn } from "@/lib/utils";
 
 export function AccountInfoStep() {
   const [username, setUsername] = useState("");
@@ -14,7 +17,24 @@ export function AccountInfoStep() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { formData, isLoading } = useSelector((state) => state.auth.registeration);
+  const { formData } = useSelector((state) => state.auth.registeration);
+  const { isLoading } = useSelector((state) => state.auth);
+
+  const passwordChecks = useMemo(
+    () => [
+      { label: "At least 6 characters", met: password.length >= 6 },
+      {
+        label: "Passwords match",
+        met: Boolean(confirmPassword) && password === confirmPassword,
+      },
+    ],
+    [confirmPassword, password],
+  );
+
+  const canSubmit =
+    username.trim() &&
+    passwordChecks.every((item) => item.met) &&
+    !isLoading;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -43,51 +63,88 @@ export function AccountInfoStep() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6 animate-in fade-in slide-in-from-right-8 duration-500">
-      
+    <form onSubmit={handleSubmit} className="space-y-5 animate-in fade-in slide-in-from-right-4 duration-300">
       <div className="space-y-4">
         <div className="space-y-2">
-          <Label htmlFor="username" className="text-slate-700 font-medium">Username</Label>
-          <Input
-            id="username"
-            placeholder="johndoe"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            className="h-12 bg-slate-50 border-slate-200 focus:bg-white focus:border-indigo-500 focus:ring-indigo-500/20 rounded-lg"
-          />
+          <Label htmlFor="username" className="text-sm font-medium text-slate-700">
+            Username
+          </Label>
+          <div className="relative">
+            <User className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-slate-400" />
+            <Input
+              id="username"
+              placeholder="johndoe"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              autoComplete="username"
+              className="h-12 rounded-md border-slate-200 bg-white pl-10 text-slate-950 shadow-sm transition focus-visible:border-slate-400 focus-visible:ring-slate-200"
+            />
+          </div>
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="password" className="text-slate-700 font-medium">Password</Label>
-          <Input
-            id="password"
-            type="password"
-            placeholder="••••••••"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="h-12 bg-slate-50 border-slate-200 focus:bg-white focus:border-indigo-500 focus:ring-indigo-500/20 rounded-lg"
-          />
+          <Label htmlFor="password" className="text-sm font-medium text-slate-700">
+            Password
+          </Label>
+          <div className="relative">
+            <LockKeyhole className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-slate-400" />
+            <Input
+              id="password"
+              type="password"
+              placeholder="Create a password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              autoComplete="new-password"
+              className="h-12 rounded-md border-slate-200 bg-white pl-10 text-slate-950 shadow-sm transition focus-visible:border-slate-400 focus-visible:ring-slate-200"
+            />
+          </div>
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="confirm-password" className="text-slate-700 font-medium">Confirm Password</Label>
-          <Input
-            id="confirm-password"
-            type="password"
-            placeholder="••••••••"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            className="h-12 bg-slate-50 border-slate-200 focus:bg-white focus:border-indigo-500 focus:ring-indigo-500/20 rounded-lg"
-          />
+          <Label htmlFor="confirm-password" className="text-sm font-medium text-slate-700">
+            Confirm password
+          </Label>
+          <div className="relative">
+            <LockKeyhole className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-slate-400" />
+            <Input
+              id="confirm-password"
+              type="password"
+              placeholder="Confirm your password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              autoComplete="new-password"
+              className="h-12 rounded-md border-slate-200 bg-white pl-10 text-slate-950 shadow-sm transition focus-visible:border-slate-400 focus-visible:ring-slate-200"
+            />
+          </div>
         </div>
       </div>
 
-      <Button 
-        type="submit" 
-        className="h-12 w-full bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 text-white font-medium rounded-lg shadow-md shadow-indigo-500/20 mt-2"
-        disabled={isLoading}
+      <div className="rounded-md border border-slate-200 bg-slate-50 p-3">
+        <div className="space-y-2">
+          {passwordChecks.map((item) => (
+            <div key={item.label} className="flex items-center gap-2 text-xs text-slate-600">
+              <span
+                className={cn(
+                  "flex size-4 items-center justify-center rounded-sm border",
+                  item.met
+                    ? "border-cyan-600 bg-cyan-600 text-white"
+                    : "border-slate-300 bg-white text-transparent",
+                )}
+              >
+                <Check className="size-3" />
+              </span>
+              {item.label}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <Button
+        type="submit"
+        className="h-12 w-full rounded-md bg-slate-950 text-sm font-semibold text-white shadow-lg shadow-slate-900/15 hover:bg-slate-800 active:scale-[0.99]"
+        disabled={!canSubmit}
       >
-        {isLoading ? "Creating account..." : "Complete Registration"}
+        {isLoading ? "Creating account..." : "Create account"}
       </Button>
     </form>
   );

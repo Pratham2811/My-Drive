@@ -29,6 +29,7 @@ export async function googleAuthController(req, res) {
       // prompt: "consent",
       // access_type:"offline"
     });
+
     res.status(200).json({
       success: true,
       data: authURL,
@@ -40,6 +41,7 @@ export async function googleAuthController(req, res) {
 export async function googleAuthCallbackController(req, res, next) {
   try {
     const { code } = req.query;
+
     let shouldAssignFga = false;
     let fgaUserId, fgaRootDirId;
     if (!code) {
@@ -73,7 +75,7 @@ export async function googleAuthCallbackController(req, res, next) {
       userActiveCheck(user);
     } else {
       user = await User.findOne({ email });
-      userActiveCheck(user);
+
       if (user) {
         provider = await AuthProvider.create({
           userId: user._id,
@@ -109,6 +111,7 @@ export async function googleAuthCallbackController(req, res, next) {
           providerUserId: sub,
           providerEmail: email,
         });
+        console.log("Hidiwefiueuif");
       }
     }
     if (shouldAssignFga) {

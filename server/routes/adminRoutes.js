@@ -15,25 +15,25 @@ router.get("/users", checkAuth, authorize("USER_VIEW"), getAllUsersController);
 router.post(
   "/logout-users",
   checkAuth,
-  authorize("USER_FORCE_LOGOUT"),
+  authorize(),
   LogoutUserController,
 );
 router.put(
   "/suspend-users",
   checkAuth,
-  authorize("USER_SUSPEND"),
+  authorize(),
   suspendUserController,
 );
 router.put(
   "/reactivate-user",
   checkAuth,
-  authorize("USER_UPDATE"),
+  authorize(),
   reactivateUserController,
 );
 router.delete(
   "/soft-delete/:userId",
   checkAuth,
-  authorize("USER_DELETE"),
+  authorize(),
   softDeleteUserController,
 );
 export default router;

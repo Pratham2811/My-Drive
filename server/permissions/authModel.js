@@ -5,12 +5,21 @@ export const model = {
       type: "user"
     },
 
-    // 🔹 FOLDER
+    
     {
       type: "folder",
       relations: {
         owner: { this: {} },
-        editor: { this: {} },
+
+        editor: {
+          union: {
+            child: [
+              { this: {} },
+              { computedUserset: { relation: "owner" } }
+            ]
+          }
+        },
+
         viewer: {
           union: {
             child: [
@@ -23,19 +32,35 @@ export const model = {
       },
       metadata: {
         relations: {
-          owner: { directly_related_user_types: [{ type: "user" }] },
-          editor: { directly_related_user_types: [{ type: "user" }] },
-          viewer: { directly_related_user_types: [{ type: "user" }] }
+          owner: {
+            directly_related_user_types: [{ type: "user" }]
+          },
+          editor: {
+            directly_related_user_types: [{ type: "user" }]
+          },
+          viewer: {
+            directly_related_user_types: [{ type: "user" }]
+          }
         }
       }
     },
 
-    // 🔹 DOCUMENT
+    // =========================
+    // 📄 DOCUMENT (FILE)
+    // =========================
     {
       type: "document",
       relations: {
         owner: { this: {} },
-        editor: { this: {} },
+
+        editor: {
+          union: {
+            child: [
+              { this: {} },
+              { computedUserset: { relation: "owner" } }
+            ]
+          }
+        },
 
         viewer: {
           union: {
@@ -44,7 +69,7 @@ export const model = {
               { computedUserset: { relation: "editor" } },
               { computedUserset: { relation: "owner" } },
 
-              // 🔥 IMPORTANT: inheritance
+              // 🔥 inheritance from folder
               {
                 tupleToUserset: {
                   tupleset: { relation: "parent" },
@@ -55,18 +80,25 @@ export const model = {
           }
         },
 
-        // 🔥 link document → folder
+        // 🔥 link file → folder
         parent: { this: {} }
       },
 
       metadata: {
         relations: {
-          owner: { directly_related_user_types: [{ type: "user" }] },
-          editor: { directly_related_user_types: [{ type: "user" }] },
-          viewer: { directly_related_user_types: [{ type: "user" }] },
+          owner: {
+            directly_related_user_types: [{ type: "user" }]
+          },
+          editor: {
+            directly_related_user_types: [{ type: "user" }]
+          },
+          viewer: {
+            directly_related_user_types: [{ type: "user" }]
+          },
 
-          // 🔥 parent relation must accept folder
-          parent: { directly_related_user_types: [{ type: "folder" }] }
+          parent: {
+            directly_related_user_types: [{ type: "folder" }]
+          }
         }
       }
     }

@@ -36,7 +36,7 @@ const authSlice = createSlice({
         ...action.payload,
       };
     },
-    goBack(state, action) {
+    goBack(state) {
       if (state.registeration.step === "INFO") {
         state.registeration.step = "EMAIL";
       }
@@ -60,11 +60,11 @@ const authSlice = createSlice({
         state.isLoading = false;
         state.error = action.payload;
       })
-      .addCase(verifyOtp.pending, (state, action) => {
+      .addCase(verifyOtp.pending, (state) => {
         state.isLoading = true;
         state.error = null;
       })
-      .addCase(verifyOtp.fulfilled, (state, action) => {
+      .addCase(verifyOtp.fulfilled, (state) => {
         ((state.isLoading = false),
           (state.otpVerified = true),
           (state.error = null),
@@ -85,10 +85,11 @@ const authSlice = createSlice({
         state.isLoading = false;
         state.error = action.payload;
       })
-      .addCase(login.pending, (state, action) => {
+      .addCase(login.pending, (state) => {
         state.isLoading = true;
       })
       .addCase(login.fulfilled, (state, action) => {
+        state.isLoading = false;
         state.status = "authenticated";
         state.user = action.payload.user;
       })
@@ -98,7 +99,7 @@ const authSlice = createSlice({
         state.isLoading = false;
         state.error = action.payload;
       })
-      .addCase(getUser.pending, (state, action) => {
+      .addCase(getUser.pending, (state) => {
         state.isLoading = true;
       })
       .addCase(getUser.fulfilled, (state, action) => {
